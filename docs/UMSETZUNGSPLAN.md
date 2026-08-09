@@ -167,6 +167,7 @@ Für jede technische Entscheidung eine kurze Markdown-Datei in `docs/adr/` nach 
 
 ```markdown
 # ADR 00X: Titel der Entscheidung
+
 **Status:** entschieden | offen
 **Kontext:** Welches Problem lösen wir?
 **Geprüfte Alternativen:** Option A (Vor-/Nachteile), Option B (…)
@@ -195,16 +196,16 @@ Titelblatt → Inhaltsverzeichnis → Vorwort → Abstract (zuletzt!) → Einlei
 
 ## 4. Rollenverteilung (Vorschlag, im Team fixieren)
 
-| Bereich | Lead | Support |
-|---|---|---|
-| Setup, Deployment, Supabase | Linus | Floris |
-| Auth, Datenmodell, Backend-Logik | Floris | Linus |
-| Design, Figma, UI-Umsetzung, Screenshots | Timon | – |
-| Briefing-Flow & Suche | Linus | Timon (UX) |
-| Chat & Bewertungen | Floris | – |
-| Lernjournal | jede*r selbst | – |
-| ADRs / Technik-Doku | wer entscheidet, schreibt | – |
-| Wettbewerbsanalyse dasauge.de | Timon | – |
+| Bereich                                  | Lead                      | Support    |
+| ---------------------------------------- | ------------------------- | ---------- |
+| Setup, Deployment, Supabase              | Linus                     | Floris     |
+| Auth, Datenmodell, Backend-Logik         | Floris                    | Linus      |
+| Design, Figma, UI-Umsetzung, Screenshots | Timon                     | –          |
+| Briefing-Flow & Suche                    | Linus                     | Timon (UX) |
+| Chat & Bewertungen                       | Floris                    | –          |
+| Lernjournal                              | jede*r selbst             | –          |
+| ADRs / Technik-Doku                      | wer entscheidet, schreibt | –          |
+| Wettbewerbsanalyse dasauge.de            | Timon                     | –          |
 
 ---
 
@@ -219,10 +220,10 @@ Titelblatt → Inhaltsverzeichnis → Vorwort → Abstract (zuletzt!) → Einlei
 
 ## 6. Risiken & Gegenmassnahmen
 
-| Risiko | Gegenmassnahme |
-|---|---|
-| Scope zu gross für den Zeitrahmen | MVP = Meilenstein D; Phasen E/F sind Ausbaustufen. Bei Verzug: Features streichen, nicht Qualität |
-| Supabase/SSR-Integration frisst Zeit | In Phase A isoliert testen, bevor Features darauf aufbauen |
-| Doku bleibt liegen | ADRs + Lernjournal + Screenshots laufend; Freitags-Ritual ist nicht verhandelbar |
-| Ungleiche Arbeitsverteilung | Issues mit Zuweisung, Commit-Historie macht Beiträge sichtbar |
-| Wortzahl verfehlt (±20 % = Abzug) | Zielwert mit Coaches klären, ab Phase D monatlich Wortstand prüfen |
+| Risiko                               | Gegenmassnahme                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Scope zu gross für den Zeitrahmen    | MVP = Meilenstein D; Phasen E/F sind Ausbaustufen. Bei Verzug: Features streichen, nicht Qualität |
+| Supabase/SSR-Integration frisst Zeit | In Phase A isoliert testen, bevor Features darauf aufbauen                                        |
+| Doku bleibt liegen                   | ADRs + Lernjournal + Screenshots laufend; Freitags-Ritual ist nicht verhandelbar                  |
+| Ungleiche Arbeitsverteilung          | Issues mit Zuweisung, Commit-Historie macht Beiträge sichtbar                                     |
+| Wortzahl verfehlt (±20 % = Abzug)    | Zielwert mit Coaches klären, ab Phase D monatlich Wortstand prüfen                                |
