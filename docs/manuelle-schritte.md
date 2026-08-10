@@ -48,6 +48,29 @@ und `src/app/api/health/route.ts`).
    (`/api/health` → `{"status":"ok","supabase":true}`, sobald Schritt 1 erledigt ist).
 4. Deployte URL und Supabase-Projektname in `README.md` ergänzen (Platzhalter aktuell noch offen).
 
+## 4. Produktions-SMTP für Supabase Auth einrichten
+
+Der in Supabase standardmässig aktivierte Mailversand ("Built-in Email Service") ist ausdrücklich
+nur für Tests gedacht: stark rate-limitiert (wenige Mails pro Stunde) und verschickt aus einer
+Supabase-eigenen Adresse, die schnell im Spam landet. Registrierungs-Bestätigung und
+Passwort-Reset (`/passwort-vergessen`) funktionieren damit lokal und für einzelne manuelle Tests,
+aber nicht für echten Betrieb mit mehreren Nutzer:innen.
+
+1. Einen Transaktions-E-Mail-Dienst wählen (z. B. Resend, Postmark oder SendGrid — alle haben ein
+   kostenloses Kontingent, das für ein Schulprojekt reicht).
+2. Beim gewählten Dienst ein Konto erstellen, die Absender-Domain verifizieren (DNS-Einträge, die
+   der Dienst vorgibt) und SMTP-Zugangsdaten (Host, Port, Benutzername, Passwort) erzeugen.
+3. Im Supabase-Dashboard: **Project Settings → Authentication → SMTP Settings** öffnen,
+   "Enable Custom SMTP" aktivieren und die Zugangsdaten aus Schritt 2 eintragen. Absenderadresse
+   und -name (z. B. `no-reply@<eure-domain>`) setzen.
+4. Test-E-Mail über den Dashboard-Button verschicken und im eigenen Postfach prüfen.
+5. Optional, aber empfohlen: Unter **Authentication → Email Templates** die Standardtexte (z. B.
+   "Reset Password") auf Deutsch anpassen, passend zur deutschsprachigen UI dieser App.
+
+Die SMTP-Zugangsdaten selbst gehören **nicht** ins Repo — sie werden ausschliesslich im
+Supabase-Dashboard hinterlegt, nicht in `.env.local`/`.env.example` oder Netlifys
+Umgebungsvariablen.
+
 ## Offene Punkte nach diesen Schritten
 
 - [x] Supabase-Projekt erstellt und Credentials in `.env.local` (lokal) und Netlify (Produktion)
@@ -55,3 +78,6 @@ und `src/app/api/health/route.ts`).
 - [x] Netlify mit dem Repo verbunden, `main` deployt
 - [x] Deploy Previews für Pull Requests aktiviert
 - [x] Live-Verifikation von `/api/health` mit echter Supabase-Verbindung (`supabase: true`)
+- [ ] Produktions-SMTP für Supabase Auth eingerichtet (aktuell: Standard-Mailversand, nur für
+      Tests geeignet — Registrierung/Login funktionieren, Massenversand an mehrere Nutzer:innen
+      nicht)

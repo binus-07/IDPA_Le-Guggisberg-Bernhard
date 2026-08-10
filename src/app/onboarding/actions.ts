@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { onboardingSchema } from "@/lib/auth/validation";
 import { createClient } from "@/lib/supabase/server";
@@ -38,6 +39,11 @@ export async function onboarding(
   if (error) {
     return { error: "Speichern hat nicht geklappt. Bitte versuche es erneut." };
   }
+
+  // Ohne das koennte Next's client-seitiger Router-Cache bei einem erneuten Login kurz
+  // danach noch die alte (rollenlose) RSC-Antwort fuer /onboarding ausliefern, statt neu
+  // vom Server zu laden -- das Profil-Update aendert aber genau das Ergebnis dieser Route.
+  revalidatePath("/onboarding");
 
   redirect(`/dashboard/${parsed.data.rolle}`);
 }

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { isSafeRedirectTarget } from "@/lib/auth/route-guard";
 import { translateAuthError } from "@/lib/auth/error-messages";
+import { fetchSessionAndRolle } from "@/lib/auth/session";
 import { anmeldenSchema } from "@/lib/auth/validation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,13 +31,16 @@ export async function anmelden(
     return { error: translateAuthError(error) };
   }
 
-  // Ohne gueltiges redirect-Ziel geht es auf /onboarding -- der Proxy leitet von dort
-  // automatisch weiter zum passenden Dashboard, falls bereits eine Rolle gesetzt ist.
   const redirectParam = formData.get("redirect");
-  const target =
-    typeof redirectParam === "string" && isSafeRedirectTarget(redirectParam)
-      ? redirectParam
-      : "/onboarding";
+  if (typeof redirectParam === "string" && isSafeRedirectTarget(redirectParam)) {
+    redirect(redirectParam);
+  }
 
-  redirect(target);
+  // Ohne explizites redirect-Ziel direkt zum passenden Ort weiterleiten (Onboarding oder
+  // eigenes Dashboard), statt ueber /onboarding zu gehen und auf eine zweite Umleitung durch
+  // den Proxy zu setzen: ein Redirect direkt im Anschluss an eine Server Action wird vom
+  // Next.js-Client bei der naechsten, vom Proxy nochmals umgeleiteten Navigation nicht
+  // zuverlaessig verfolgt (RSC-Fetch der Server Action, nicht die volle Browser-Navigation).
+  const { rolle } = await fetchSessionAndRolle(supabase);
+  redirect(rolle ? `/dashboard/${rolle}` : "/onboarding");
 }
