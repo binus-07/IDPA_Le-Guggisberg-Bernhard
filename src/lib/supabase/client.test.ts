@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { createBrowserClient } = vi.hoisted(() => ({
   createBrowserClient: vi.fn(() => ({ mocked: "browser-client" })),
@@ -11,7 +11,7 @@ describe("createClient (Supabase Browser Client)", () => {
     vi.resetModules();
     createBrowserClient.mockClear();
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
-    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "test-anon-key");
   });
 
   it("instanziiert den Browser-Client mit URL und Anon-Key aus den Env-Variablen", async () => {

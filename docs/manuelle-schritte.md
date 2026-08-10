@@ -13,7 +13,7 @@ gemacht werden muss.
    gehört nicht ins Repo.
 3. Nach Erstellung des Projekts: **Project Settings → API** öffnen. Dort stehen:
    - **Project URL** → wird zu `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public**-Key → wird zu `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **anon public**-Key → wird zu `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 4. Lokal: `.env.example` nach `.env.local` kopieren (`cp .env.example .env.local`) und die beiden
    Werte eintragen. `.env.local` ist in `.gitignore` und wird nie committet.
 5. Verifizieren: `npm run dev` starten und
@@ -34,7 +34,7 @@ und `src/app/api/health/route.ts`).
 3. **Site settings → Environment variables** öffnen und die gleichen zwei Variablen wie lokal
    eintragen:
    - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 4. Production-Branch auf `main` setzen (Standard bei Netlify).
 5. **Deploy previews** aktivieren (Site settings → Build & deploy → Deploy contexts), damit jede
    Pull Request automatisch eine Vorschau bekommt — Timon kann Design-Änderungen dann direkt im
@@ -50,8 +50,8 @@ und `src/app/api/health/route.ts`).
 
 ## Offene Punkte nach diesen Schritten
 
-- [ ] Supabase-Projekt erstellt und Credentials in `.env.local` (lokal) und Netlify (Produktion)
+- [x] Supabase-Projekt erstellt und Credentials in `.env.local` (lokal) und Netlify (Produktion)
       hinterlegt
-- [ ] Netlify mit dem Repo verbunden, `main` deployt
-- [ ] Deploy Previews für Pull Requests aktiviert
-- [ ] Live-Verifikation von `/api/health` mit echter Supabase-Verbindung (`supabase: true`)
+- [x] Netlify mit dem Repo verbunden, `main` deployt
+- [x] Deploy Previews für Pull Requests aktiviert
+- [x] Live-Verifikation von `/api/health` mit echter Supabase-Verbindung (`supabase: true`)
