@@ -317,5 +317,12 @@ unabhängiger, bereits vom Team vorbereiteter Branch (`chore/supabase-key-naming
 Health-Check-Roundtrip) per eigenem PR gemergt werden, da Phase B auf dieser Namensgebung
 aufbaut. Dabei entdeckte und behobene Nebensache: das Umbenennungs-Skript hatte `README.md`,
 `docs/manuelle-schritte.md` und `.env.example` mit UTF-8-Mojibake beschädigt (Ursache eines
-externen Werkzeugs, nicht dieses Auftrags) — korrigiert vor dem Merge. Details siehe
-Pull-Request-Beschreibungen von PR #2 und PR #3.
+externen Werkzeugs, nicht dieses Auftrags) — korrigiert vor dem Merge (siehe
+[PR #2](https://github.com/binus-07/IDPA_Le-Guggisberg-Bernhard/pull/2)).
+
+Der Phase-B-Branch (`feature/phase-b-auth`) wurde vom Team zwischenzeitlich in zwei Teilen
+gemerged: [PR #3](https://github.com/binus-07/IDPA_Le-Guggisberg-Bernhard/pull/3) (erste Hälfte,
+während der laufenden Umsetzung gemerged) und
+[PR #4](https://github.com/binus-07/IDPA_Le-Guggisberg-Bernhard/pull/4) (Rest: Passwort-Reset,
+Playwright-E2E, ADRs, Doku, ein während der E2E-Testentwicklung gefundener und behobener
+Login-Redirect-Bug). Details siehe die jeweiligen Pull-Request-Beschreibungen.
