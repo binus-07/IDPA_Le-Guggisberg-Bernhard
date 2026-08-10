@@ -14,6 +14,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // node_modules explizit, plus vom Supabase CLI/Docker generierte Laufzeit-Scaffolds
+    // (Deno-Edge-Runtime-Dateien etc.), die kein Teil unseres Codes sind.
+    "node_modules/**",
+    "supabase/.temp/**",
+    "supabase/.branches/**",
   ]),
 ]);
 
