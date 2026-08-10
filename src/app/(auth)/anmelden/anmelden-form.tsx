@@ -8,9 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { anmelden, type AnmeldenState } from "./actions";
 
-const initialState: AnmeldenState = {};
-
-export function AnmeldenForm({ redirectTo }: { redirectTo: string }) {
+export function AnmeldenForm({
+  redirectTo,
+  initialError,
+}: {
+  redirectTo: string;
+  initialError?: string;
+}) {
+  const initialState: AnmeldenState = { error: initialError };
   const [state, formAction, pending] = useActionState(anmelden, initialState);
 
   return (

@@ -71,6 +71,22 @@ Die SMTP-Zugangsdaten selbst gehören **nicht** ins Repo — sie werden ausschli
 Supabase-Dashboard hinterlegt, nicht in `.env.local`/`.env.example` oder Netlifys
 Umgebungsvariablen.
 
+## 5. E-Mail-Vorlagen auf unsere Bestätigungs-Route umstellen
+
+Ohne diesen Schritt verifiziert Supabase Bestätigungs-/Reset-Links auf der **eigenen** Domain
+(`*.supabase.co`) und leitet die Person danach unauthentifiziert auf unsere Seite weiter — keine
+Session-Cookie wird für unsere Domain gesetzt, die E-Mail-Bestätigung wirkt "kaputt". Unsere App
+erwartet stattdessen `token_hash` + `type` als Query-Parameter direkt an
+[`src/app/auth/confirm/route.ts`](../src/app/auth/confirm/route.ts).
+
+1. Im Supabase-Dashboard: **Authentication → Email Templates** öffnen.
+2. Bei **Confirm signup**: den Link-Text/`{{ .ConfirmationURL }}` ersetzen durch
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/onboarding`.
+3. Bei **Reset Password**: entsprechend
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/passwort-neu`.
+4. Speichern, danach eine echte Test-Registrierung durchführen und die tatsächlich empfangene
+   Mail-URL kontrollieren (`token_hash`-Parameter vorhanden, Link zeigt auf `/auth/confirm`).
+
 ## Offene Punkte nach diesen Schritten
 
 - [x] Supabase-Projekt erstellt und Credentials in `.env.local` (lokal) und Netlify (Produktion)
@@ -81,3 +97,5 @@ Umgebungsvariablen.
 - [ ] Produktions-SMTP für Supabase Auth eingerichtet (aktuell: Standard-Mailversand, nur für
       Tests geeignet — Registrierung/Login funktionieren, Massenversand an mehrere Nutzer:innen
       nicht)
+- [ ] E-Mail-Vorlagen ("Confirm signup", "Reset Password") auf `/auth/confirm` umgestellt —
+      ohne diesen Schritt bleibt die E-Mail-Bestätigung defekt, siehe Abschnitt 5 oben

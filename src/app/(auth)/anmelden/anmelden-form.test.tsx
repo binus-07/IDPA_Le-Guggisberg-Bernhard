@@ -31,6 +31,12 @@ describe("AnmeldenForm", () => {
     expect(hidden).toHaveValue("/dashboard/freelancer");
   });
 
+  it("zeigt eine ueber die URL uebergebene Fehlermeldung sofort an (z. B. ungueltiger Bestaetigungslink)", () => {
+    render(<AnmeldenForm redirectTo="" initialError="Der Link ist ungültig oder abgelaufen." />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Der Link ist ungültig oder abgelaufen.");
+  });
+
   it("zeigt eine Fehlermeldung, wenn die Server Action einen Fehler zurückgibt", async () => {
     vi.mocked(anmelden).mockResolvedValue({ error: "E-Mail-Adresse oder Passwort ist falsch." });
     render(<AnmeldenForm redirectTo="" />);

@@ -21,5 +21,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL("/anmelden", origin));
+  return NextResponse.redirect(new URL("/anmelden?fehler=link-ungueltig", origin));
 }
