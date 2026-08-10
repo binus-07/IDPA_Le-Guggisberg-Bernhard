@@ -11,7 +11,7 @@ export async function GET() {
   if (!url || !key) {
     return NextResponse.json(
       { status: "error", supabase: false, reason: "env_missing" },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -27,7 +27,7 @@ export async function GET() {
     if (!res.ok) {
       return NextResponse.json(
         { status: "error", supabase: false, reason: `http_${res.status}` },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { status: "error", supabase: false, reason: "unreachable" },
-      { status: 503 }
+      { status: 503 },
     );
   }
 }
