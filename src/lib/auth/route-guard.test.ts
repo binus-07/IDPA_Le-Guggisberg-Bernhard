@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { determineRedirect } from "./route-guard";
+import { determineRedirect, isSafeRedirectTarget } from "./route-guard";
 
 describe("determineRedirect", () => {
   it("erlaubt Zugriff aufs eigene Dashboard bei richtiger Rolle", () => {
@@ -71,5 +71,24 @@ describe("determineRedirect", () => {
 
   it("erlaubt /anmelden ohne Session", () => {
     expect(determineRedirect({ pathname: "/anmelden", hasSession: false, rolle: null })).toBeNull();
+  });
+});
+
+describe("isSafeRedirectTarget", () => {
+  it("erlaubt relative Pfade", () => {
+    expect(isSafeRedirectTarget("/dashboard/freelancer")).toBe(true);
+  });
+
+  it("lehnt protokoll-relative URLs ab (//evil.example)", () => {
+    expect(isSafeRedirectTarget("//evil.example")).toBe(false);
+  });
+
+  it("lehnt absolute URLs mit Protokoll ab", () => {
+    expect(isSafeRedirectTarget("https://evil.example")).toBe(false);
+    expect(isSafeRedirectTarget("/redirect?next=https://evil.example")).toBe(false);
+  });
+
+  it("lehnt Pfade ohne fuehrenden Slash ab", () => {
+    expect(isSafeRedirectTarget("dashboard")).toBe(false);
   });
 });

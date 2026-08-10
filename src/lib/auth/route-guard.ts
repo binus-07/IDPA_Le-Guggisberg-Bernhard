@@ -57,3 +57,11 @@ export function determineRedirect({ pathname, hasSession, rolle }: RouteGuardInp
 
   return null;
 }
+
+/**
+ * Verhindert Open-Redirects ueber den ?redirect=-Parameter: nur relative Pfade, die mit genau
+ * einem "/" beginnen (kein "//host" und kein eingebettetes "://"), sind ein gueltiges Ziel.
+ */
+export function isSafeRedirectTarget(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//") && !path.includes("://");
+}
