@@ -1,0 +1,15 @@
+# Erzwingt LF fuer Textdateien, unabhaengig vom lokalen core.autocrlf (Windows-Standard ist
+# core.autocrlf=true, was Textdateien beim Checkout auf CRLF umstellt -- das kollidiert mit
+# Prettiers Default von "LF" und liess nach jedem Checkout die komplette Codebasis als
+# "unformatiert" erscheinen, obwohl inhaltlich nichts geaendert war).
+* text=auto eol=lf
+
+# Binaerdateien explizit ausnehmen, damit "text=auto" sie nicht faelschlich anfasst.
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
