@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { translateAuthError } from "@/lib/auth/error-messages";
 import { registrierenSchema } from "@/lib/auth/validation";
@@ -23,10 +24,16 @@ export async function registrieren(
     return { error: parsed.error.issues[0]?.message ?? "Bitte die Eingaben prüfen." };
   }
 
+  // headers() statt window.location.origin: Server Actions laufen serverseitig, "window"
+  // existiert dort nicht. Gleiches Muster wie in passwort-vergessen/actions.ts.
+  const origin = (await headers()).get("origin");
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
+    options: {
+      emailRedirectTo: `${origin}/auth/confirm?next=/onboarding`,
+    },
   });
 
   if (error) {
