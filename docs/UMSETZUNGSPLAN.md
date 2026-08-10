@@ -50,11 +50,11 @@ Die Phasen bauen aufeinander auf. Erst wenn das Grundgerüst (Phase A–C) steht
 
 ### Phase B – Auth & Rollen (ca. 1–2 Wochen)
 
-- [ ] Registrierung + Login über Supabase Auth
-- [ ] Rollenmodell definieren: `unternehmen`, `freelancer` (evtl. `admin`)
-- [ ] Rollenwahl beim Onboarding (kurz halten – Umfrage: "kurzes Onboarding" war explizite Anforderung)
-- [ ] Row-Level-Security-Policies für erste Tabellen aufsetzen
-- [ ] Geschützte Routen / Middleware (wer sieht was)
+- [x] Registrierung + Login über Supabase Auth
+- [x] Rollenmodell definieren: `unternehmen`, `freelancer` (evtl. `admin`)
+- [x] Rollenwahl beim Onboarding (kurz halten – Umfrage: "kurzes Onboarding" war explizite Anforderung)
+- [x] Row-Level-Security-Policies für erste Tabellen aufsetzen
+- [x] Geschützte Routen / Middleware (wer sieht was)
 
 **Meilenstein B:** Ein User kann sich registrieren, einloggen und landet je nach Rolle auf dem richtigen Dashboard-Skelett.
 
