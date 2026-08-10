@@ -33,13 +33,18 @@ Die Phasen bauen aufeinander auf. Erst wenn das Grundgerüst (Phase A–C) steht
 
 ### Phase A – Fundament (ca. 1–2 Wochen)
 
-- [ ] GitHub-Organisation/Repo anlegen (Struktur siehe Abschnitt 2)
-- [ ] Next.js-Projekt mit TypeScript + App Router aufsetzen (`create-next-app`)
-- [ ] ESLint + Prettier konfigurieren, damit alle gleich formatieren
-- [ ] Netlify mit dem Repo verbinden, erstes Deployment von `main` testen
-- [ ] Supabase-Projekt erstellen, Verbindung via `@supabase/ssr` einrichten (Server Components, Cookies, Sessions testen)
-- [ ] Entscheidung UI-System treffen (Tailwind + shadcn/ui prüfen) → **ADR schreiben** (siehe Abschnitt 3)
-- [ ] Timon: Design-Tokens aus Figma ableiten (Farben, Typografie – Anton für Titel, Inter für Text, 8px-Radius gemäss Mockup)
+- [x] GitHub-Organisation/Repo anlegen (Struktur siehe Abschnitt 2)
+- [x] Next.js-Projekt mit TypeScript + App Router aufsetzen (`create-next-app`)
+- [x] ESLint + Prettier konfigurieren, damit alle gleich formatieren
+- [ ] Netlify mit dem Repo verbinden, erstes Deployment von `main` testen — manueller Schritt,
+      siehe [`docs/manuelle-schritte.md`](manuelle-schritte.md); `netlify.toml` ist vorbereitet
+- [ ] Supabase-Projekt erstellen, Verbindung via `@supabase/ssr` einrichten (Server Components, Cookies, Sessions testen) —
+      Code (Clients, Proxy, Health-Route) ist fertig und getestet (gemockt), das eigentliche
+      Supabase-Projekt fehlt noch (manueller Schritt, siehe [`docs/manuelle-schritte.md`](manuelle-schritte.md))
+- [x] Entscheidung UI-System treffen (Tailwind + shadcn/ui prüfen) → **ADR schreiben** (siehe Abschnitt 3)
+- [ ] Timon: Design-Tokens aus Figma ableiten (Farben, Typografie – Anton für Titel, Inter für Text, 8px-Radius gemäss Mockup) —
+      technische Umsetzung der vorgegebenen Werte (Anton/Inter/8px) ist in `src/app/globals.css`
+      bereits vorbereitet; Ableitung aus dem tatsächlichen Figma-Mockup steht noch aus
 
 **Meilenstein A:** "Hello World" läuft deployed auf Netlify und kann Daten aus Supabase lesen.
 
@@ -167,6 +172,7 @@ Für jede technische Entscheidung eine kurze Markdown-Datei in `docs/adr/` nach 
 
 ```markdown
 # ADR 00X: Titel der Entscheidung
+
 **Status:** entschieden | offen
 **Kontext:** Welches Problem lösen wir?
 **Geprüfte Alternativen:** Option A (Vor-/Nachteile), Option B (…)
@@ -195,16 +201,16 @@ Titelblatt → Inhaltsverzeichnis → Vorwort → Abstract (zuletzt!) → Einlei
 
 ## 4. Rollenverteilung (Vorschlag, im Team fixieren)
 
-| Bereich | Lead | Support |
-|---|---|---|
-| Setup, Deployment, Supabase | Linus | Floris |
-| Auth, Datenmodell, Backend-Logik | Floris | Linus |
-| Design, Figma, UI-Umsetzung, Screenshots | Timon | – |
-| Briefing-Flow & Suche | Linus | Timon (UX) |
-| Chat & Bewertungen | Floris | – |
-| Lernjournal | jede*r selbst | – |
-| ADRs / Technik-Doku | wer entscheidet, schreibt | – |
-| Wettbewerbsanalyse dasauge.de | Timon | – |
+| Bereich                                  | Lead                      | Support    |
+| ---------------------------------------- | ------------------------- | ---------- |
+| Setup, Deployment, Supabase              | Linus                     | Floris     |
+| Auth, Datenmodell, Backend-Logik         | Floris                    | Linus      |
+| Design, Figma, UI-Umsetzung, Screenshots | Timon                     | –          |
+| Briefing-Flow & Suche                    | Linus                     | Timon (UX) |
+| Chat & Bewertungen                       | Floris                    | –          |
+| Lernjournal                              | jede*r selbst             | –          |
+| ADRs / Technik-Doku                      | wer entscheidet, schreibt | –          |
+| Wettbewerbsanalyse dasauge.de            | Timon                     | –          |
 
 ---
 
@@ -219,10 +225,10 @@ Titelblatt → Inhaltsverzeichnis → Vorwort → Abstract (zuletzt!) → Einlei
 
 ## 6. Risiken & Gegenmassnahmen
 
-| Risiko | Gegenmassnahme |
-|---|---|
-| Scope zu gross für den Zeitrahmen | MVP = Meilenstein D; Phasen E/F sind Ausbaustufen. Bei Verzug: Features streichen, nicht Qualität |
-| Supabase/SSR-Integration frisst Zeit | In Phase A isoliert testen, bevor Features darauf aufbauen |
-| Doku bleibt liegen | ADRs + Lernjournal + Screenshots laufend; Freitags-Ritual ist nicht verhandelbar |
-| Ungleiche Arbeitsverteilung | Issues mit Zuweisung, Commit-Historie macht Beiträge sichtbar |
-| Wortzahl verfehlt (±20 % = Abzug) | Zielwert mit Coaches klären, ab Phase D monatlich Wortstand prüfen |
+| Risiko                               | Gegenmassnahme                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Scope zu gross für den Zeitrahmen    | MVP = Meilenstein D; Phasen E/F sind Ausbaustufen. Bei Verzug: Features streichen, nicht Qualität |
+| Supabase/SSR-Integration frisst Zeit | In Phase A isoliert testen, bevor Features darauf aufbauen                                        |
+| Doku bleibt liegen                   | ADRs + Lernjournal + Screenshots laufend; Freitags-Ritual ist nicht verhandelbar                  |
+| Ungleiche Arbeitsverteilung          | Issues mit Zuweisung, Commit-Historie macht Beiträge sichtbar                                     |
+| Wortzahl verfehlt (±20 % = Abzug)    | Zielwert mit Coaches klären, ab Phase D monatlich Wortstand prüfen                                |
