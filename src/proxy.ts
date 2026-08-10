@@ -1,6 +1,7 @@
 ﻿import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { determineRedirect, type Rolle } from "@/lib/auth/route-guard";
+import { determineRedirect } from "@/lib/auth/route-guard";
+import { fetchSessionAndRolle } from "@/lib/auth/session";
 
 export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -30,21 +31,9 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // Ruft getUser() auf, damit Supabase abgelaufene Sessions erkennt und
-  // den Auth-Cookie bei Bedarf ueber setAll() erneuert.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let rolle: Rolle | null = null;
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("rolle")
-      .eq("id", user.id)
-      .single();
-    rolle = profile?.rolle ?? null;
-  }
+  // fetchSessionAndRolle() ruft u. a. getUser() auf, damit Supabase abgelaufene Sessions
+  // erkennt und den Auth-Cookie bei Bedarf ueber setAll() erneuert.
+  const { user, rolle } = await fetchSessionAndRolle(supabase);
 
   const redirectTarget = determineRedirect({
     pathname: request.nextUrl.pathname,
