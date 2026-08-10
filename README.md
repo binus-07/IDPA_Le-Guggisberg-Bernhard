@@ -9,14 +9,14 @@ Der vollständige Umsetzungsplan (Phasen, Rollen, Dokumentationsprozess) liegt i
 
 ## Stack
 
-| Bereich      | Technologie                                                 |
-| ------------ | ------------------------------------------------------------ |
-| Framework    | [Next.js](https://nextjs.org) (App Router, TypeScript)      |
-| UI           | Tailwind CSS + [shadcn/ui](https://ui.shadcn.com)           |
-| Backend      | [Supabase](https://supabase.com) (Auth, Postgres, Storage)  |
-| Hosting      | [Netlify](https://netlify.com)                              |
-| Tests        | [Vitest](https://vitest.dev) + Testing Library              |
-| Formatierung | ESLint + Prettier                                            |
+| Bereich      | Technologie                                                |
+| ------------ | ---------------------------------------------------------- |
+| Framework    | [Next.js](https://nextjs.org) (App Router, TypeScript)     |
+| UI           | Tailwind CSS + [shadcn/ui](https://ui.shadcn.com)          |
+| Backend      | [Supabase](https://supabase.com) (Auth, Postgres, Storage) |
+| Hosting      | [Netlify](https://netlify.com)                             |
+| Tests        | [Vitest](https://vitest.dev) + Testing Library             |
+| Formatierung | ESLint + Prettier                                          |
 
 ## Setup (lokal, < 10 Minuten)
 
@@ -58,16 +58,16 @@ Voraussetzung: [Node.js](https://nodejs.org) 20 oder neuer, npm.
 
 ## Scripts
 
-| Befehl                 | Zweck                                             |
-| ----------------------- | -------------------------------------------------- |
-| `npm run dev`           | Entwicklungsserver mit Hot Reload                  |
-| `npm run build`         | Produktions-Build (inkl. TypeScript-Check)         |
-| `npm run start`         | Gebauten Produktions-Build lokal starten           |
-| `npm run lint`          | ESLint über das Projekt laufen lassen              |
-| `npm run format`        | Code mit Prettier formatieren (schreibt Dateien)   |
-| `npm run format:check`  | Prettier-Formatierung prüfen, ohne zu schreiben    |
-| `npm run test`          | Vitest-Testsuite einmalig ausführen                |
-| `npx tsc --noEmit`      | Nur TypeScript-Typen prüfen, ohne zu bauen         |
+| Befehl                 | Zweck                                            |
+| ---------------------- | ------------------------------------------------ |
+| `npm run dev`          | Entwicklungsserver mit Hot Reload                |
+| `npm run build`        | Produktions-Build (inkl. TypeScript-Check)       |
+| `npm run start`        | Gebauten Produktions-Build lokal starten         |
+| `npm run lint`         | ESLint über das Projekt laufen lassen            |
+| `npm run format`       | Code mit Prettier formatieren (schreibt Dateien) |
+| `npm run format:check` | Prettier-Formatierung prüfen, ohne zu schreiben  |
+| `npm run test`         | Vitest-Testsuite einmalig ausführen              |
+| `npx tsc --noEmit`     | Nur TypeScript-Typen prüfen, ohne zu bauen       |
 
 ## Projektstruktur
 
