@@ -7,11 +7,16 @@ export interface RouteGuardInput {
 }
 
 const ONBOARDING_PATH = "/onboarding";
+const EMAIL_BESTAETIGT_PATH = "/email-bestaetigt";
 const DASHBOARD_PREFIX = "/dashboard/";
 const AUTH_PAGES = ["/anmelden", "/registrieren"];
 
 function isProtectedPath(pathname: string): boolean {
-  return pathname === ONBOARDING_PATH || pathname.startsWith(DASHBOARD_PREFIX);
+  return (
+    pathname === ONBOARDING_PATH ||
+    pathname === EMAIL_BESTAETIGT_PATH ||
+    pathname.startsWith(DASHBOARD_PREFIX)
+  );
 }
 
 function dashboardRolleFor(pathname: string): Rolle | null {
@@ -41,7 +46,7 @@ export function determineRedirect({ pathname, hasSession, rolle }: RouteGuardInp
     return rolle ? `/dashboard/${rolle}` : ONBOARDING_PATH;
   }
 
-  if (pathname === ONBOARDING_PATH) {
+  if (pathname === ONBOARDING_PATH || pathname === EMAIL_BESTAETIGT_PATH) {
     return rolle ? `/dashboard/${rolle}` : null;
   }
 

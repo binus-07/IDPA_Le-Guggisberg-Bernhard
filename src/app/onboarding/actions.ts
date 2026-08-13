@@ -2,21 +2,33 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { onboardingSchema } from "@/lib/auth/validation";
+import { onboardingFullSchema } from "@/lib/auth/validation";
 import { createClient } from "@/lib/supabase/server";
 
 export interface OnboardingState {
   error?: string;
 }
 
-export async function onboarding(
-  _prevState: OnboardingState,
-  formData: FormData,
-): Promise<OnboardingState> {
-  const parsed = onboardingSchema.safeParse({
-    rolle: formData.get("rolle"),
-    anzeigename: formData.get("anzeigename"),
-  });
+export interface OnboardingSubmitData {
+  rolle: "unternehmen" | "freelancer";
+  anzeigename: string;
+  firmenname?: string;
+  // Unternehmen
+  branche?: string | null;
+  unternehmensgroesse?: string | null;
+  gesuchte_leistungen?: string[];
+  dringlichkeit?: string | null;
+  // Freelancer
+  spezialisierungen?: string[];
+  branchen_erfahrung?: string[];
+  erfahrung_jahre?: string;
+  bio?: string;
+  verfuegbarkeit?: string | null;
+  verfuegbar_ab?: string;
+}
+
+export async function onboarding(submitData: OnboardingSubmitData): Promise<OnboardingState> {
+  const parsed = onboardingFullSchema.safeParse(submitData);
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Bitte die Eingaben prüfen." };
@@ -33,7 +45,21 @@ export async function onboarding(
 
   const { error } = await supabase
     .from("profiles")
-    .update({ rolle: parsed.data.rolle, anzeigename: parsed.data.anzeigename })
+    .update({
+      rolle: parsed.data.rolle,
+      anzeigename: parsed.data.anzeigename,
+      firmenname: parsed.data.firmenname ?? null,
+      branche: parsed.data.branche ?? null,
+      unternehmensgroesse: parsed.data.unternehmensgroesse ?? null,
+      gesuchte_leistungen: parsed.data.gesuchte_leistungen ?? null,
+      dringlichkeit: parsed.data.dringlichkeit ?? null,
+      spezialisierungen: parsed.data.spezialisierungen ?? null,
+      branchen_erfahrung: parsed.data.branchen_erfahrung ?? null,
+      erfahrung_jahre: parsed.data.erfahrung_jahre ?? null,
+      bio: parsed.data.bio ?? null,
+      verfuegbarkeit: parsed.data.verfuegbarkeit ?? null,
+      verfuegbar_ab: parsed.data.verfuegbar_ab || null,
+    })
     .eq("id", user.id);
 
   if (error) {
@@ -41,9 +67,8 @@ export async function onboarding(
   }
 
   // Ohne das koennte Next's client-seitiger Router-Cache bei einem erneuten Login kurz
-  // danach noch die alte (rollenlose) RSC-Antwort fuer /onboarding ausliefern, statt neu
-  // vom Server zu laden -- das Profil-Update aendert aber genau das Ergebnis dieser Route.
+  // danach noch die alte (rollenlose) RSC-Antwort fuer /onboarding ausliefern.
   revalidatePath("/onboarding");
 
-  redirect(`/dashboard/${parsed.data.rolle}`);
+  return {};
 }
