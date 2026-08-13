@@ -1,8 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { onboarding } from "./actions";
 
 type Rolle = "freelancer" | "unternehmen";
+
+type OnboardingData = {
+  rolle: Rolle | null;
+  anzeigename: string;
+  firmenname: string;
+  // Unternehmen
+  branche: string | null;
+  unternehmensgroesse: string | null;
+  gesuchte_leistungen: string[];
+  dringlichkeit: string | null;
+  // Freelancer
+  spezialisierungen: string[];
+  branchen_erfahrung: string[];
+  erfahrung_jahre: string;
+  bio: string;
+  verfuegbarkeit: string | null;
+  verfuegbar_ab: string;
+};
+
+const defaultData: OnboardingData = {
+  rolle: null,
+  anzeigename: "",
+  firmenname: "",
+  branche: null,
+  unternehmensgroesse: null,
+  gesuchte_leistungen: [],
+  dringlichkeit: null,
+  spezialisierungen: [],
+  branchen_erfahrung: [],
+  erfahrung_jahre: "",
+  bio: "",
+  verfuegbarkeit: null,
+  verfuegbar_ab: "",
+};
 
 // ─── Shared atoms ──────────────────────────────────────────────────────────────
 
@@ -264,14 +299,17 @@ function StepRolleAuswahl({
 
 function StepProfilSetup({
   rolle,
+  initial,
   onNext,
   onBack,
 }: {
   rolle: Rolle;
-  onNext: () => void;
+  initial: { anzeigename: string; firmenname: string };
+  onNext: (data: { anzeigename: string; firmenname: string }) => void;
   onBack: () => void;
 }) {
-  const [anzeigename, setAnzeigename] = useState("");
+  const [anzeigename, setAnzeigename] = useState(initial.anzeigename);
+  const [firmenname, setFirmenname] = useState(initial.firmenname);
   return (
     <div className="w-full max-w-[480px] flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-10 text-center tracking-wide">
@@ -299,12 +337,19 @@ function StepProfilSetup({
               </label>
               <input
                 type="text"
+                value={firmenname}
+                onChange={e => setFirmenname(e.target.value)}
                 placeholder="Name deines Unternehmens"
+                maxLength={120}
                 className="w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] placeholder-[#58423c] focus:border-[#D95D39] focus:outline-none transition-colors"
               />
             </div>
           )}
-          <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!anzeigename.trim()} />
+          <NavButtons
+            onNext={() => onNext({ anzeigename, firmenname })}
+            onBack={onBack}
+            nextDisabled={!anzeigename.trim()}
+          />
         </div>
       </div>
     </div>
@@ -316,8 +361,16 @@ function StepProfilSetup({
 const UNTERNEHMEN_BRANCHEN = [...BRANCHEN, "Bildung", "Andere"];
 const UNTERNEHMEN_BRANCHEN_ICONS = [...BRANCHEN_ICONS, "school", "category"];
 
-function StepUnternehmenBranche({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
+function StepUnternehmenBranche({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string | null;
+  onNext: (branche: string) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string | null>(initial);
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-10 text-center tracking-wide">
@@ -339,7 +392,11 @@ function StepUnternehmenBranche({ onNext, onBack }: { onNext: () => void; onBack
           </button>
         ))}
       </div>
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!selected} />
+      <NavButtons
+        onNext={() => selected && onNext(selected)}
+        onBack={onBack}
+        nextDisabled={!selected}
+      />
     </div>
   );
 }
@@ -353,8 +410,16 @@ const GROESSEN = [
   { label: "200+ Mitarbeitende", description: "Grosses Unternehmen" },
 ];
 
-function StepUnternehmenGroesse({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
+function StepUnternehmenGroesse({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string | null;
+  onNext: (groesse: string) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string | null>(initial);
   return (
     <div className="w-full max-w-lg flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-10 text-center tracking-wide">
@@ -371,15 +436,27 @@ function StepUnternehmenGroesse({ onNext, onBack }: { onNext: () => void; onBack
           />
         ))}
       </div>
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!selected} />
+      <NavButtons
+        onNext={() => selected && onNext(selected)}
+        onBack={onBack}
+        nextDisabled={!selected}
+      />
     </div>
   );
 }
 
 // ─── Step 4 (Unternehmen): Gesuchte Leistungen ─────────────────────────────────
 
-function StepUnternehmenLeistungen({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string[]>([]);
+function StepUnternehmenLeistungen({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string[];
+  onNext: (leistungen: string[]) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
     setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
   return (
@@ -391,7 +468,11 @@ function StepUnternehmenLeistungen({ onNext, onBack }: { onNext: () => void; onB
         Wähle alle Bereiche aus, in denen du aktuell oder zukünftig Unterstützung benötigst.
       </p>
       <ChipGrid options={LEISTUNGEN} selected={selected} onToggle={toggle} icons={LEISTUNGEN_ICONS} />
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={selected.length === 0} />
+      <NavButtons
+        onNext={() => onNext(selected)}
+        onBack={onBack}
+        nextDisabled={selected.length === 0}
+      />
     </div>
   );
 }
@@ -405,8 +486,16 @@ const DRINGLICHKEIT = [
   { label: "Wir evaluieren noch Optionen", description: "Noch keine konkrete Anfrage." },
 ];
 
-function StepUnternehmenDringlichkeit({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
+function StepUnternehmenDringlichkeit({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string | null;
+  onNext: (dringlichkeit: string) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string | null>(initial);
   return (
     <div className="w-full max-w-lg flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
@@ -426,15 +515,27 @@ function StepUnternehmenDringlichkeit({ onNext, onBack }: { onNext: () => void; 
           />
         ))}
       </div>
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!selected} />
+      <NavButtons
+        onNext={() => selected && onNext(selected)}
+        onBack={onBack}
+        nextDisabled={!selected}
+      />
     </div>
   );
 }
 
 // ─── Step 2 (Freelancer): Spezialisierung ──────────────────────────────────────
 
-function StepFreelancerSpezialisierung({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string[]>([]);
+function StepFreelancerSpezialisierung({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string[];
+  onNext: (specs: string[]) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
     setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
   return (
@@ -446,15 +547,27 @@ function StepFreelancerSpezialisierung({ onNext, onBack }: { onNext: () => void;
         Wähle deine Kernkompetenzen. Mindestens eine Auswahl erforderlich.
       </p>
       <ChipGrid options={LEISTUNGEN} selected={selected} onToggle={toggle} icons={LEISTUNGEN_ICONS} />
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={selected.length === 0} />
+      <NavButtons
+        onNext={() => onNext(selected)}
+        onBack={onBack}
+        nextDisabled={selected.length === 0}
+      />
     </div>
   );
 }
 
 // ─── Step 3 (Freelancer): Branchen-Erfahrung ───────────────────────────────────
 
-function StepFreelancerBranchen({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string[]>([]);
+function StepFreelancerBranchen({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string[];
+  onNext: (branchen: string[]) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
     setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
   return (
@@ -464,16 +577,28 @@ function StepFreelancerBranchen({ onNext, onBack }: { onNext: () => void; onBack
       </h1>
       <p className="text-[#dfc0b7] text-base mb-10 text-center">Mehrere möglich.</p>
       <ChipGrid options={BRANCHEN} selected={selected} onToggle={toggle} icons={BRANCHEN_ICONS} />
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={selected.length === 0} />
+      <NavButtons
+        onNext={() => onNext(selected)}
+        onBack={onBack}
+        nextDisabled={selected.length === 0}
+      />
     </div>
   );
 }
 
 // ─── Step 4 (Freelancer): Bio & Erfahrung ──────────────────────────────────────
 
-function StepFreelancerBio({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [erfahrung, setErfahrung] = useState("");
-  const [bio, setBio] = useState("");
+function StepFreelancerBio({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: { erfahrung_jahre: string; bio: string };
+  onNext: (data: { erfahrung_jahre: string; bio: string }) => void;
+  onBack: () => void;
+}) {
+  const [erfahrung, setErfahrung] = useState(initial.erfahrung_jahre);
+  const [bio, setBio] = useState(initial.bio);
   const isValid = erfahrung.length > 0 && bio.trim().length > 10;
   return (
     <div className="w-full max-w-[480px] flex flex-col items-center">
@@ -516,7 +641,11 @@ function StepFreelancerBio({ onNext, onBack }: { onNext: () => void; onBack: () 
             />
             <span className="text-xs text-[#dfc0b7] text-right">{bio.length}/300</span>
           </div>
-          <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!isValid} />
+          <NavButtons
+            onNext={() => onNext({ erfahrung_jahre: erfahrung, bio })}
+            onBack={onBack}
+            nextDisabled={!isValid}
+          />
         </div>
       </div>
     </div>
@@ -531,9 +660,17 @@ const VERFUEGBARKEIT = [
   { value: "anfrage", label: "Auf Anfrage", description: "Aktuell ausgelastet, aber offen für interessante Angebote." },
 ];
 
-function StepFreelancerVerfuegbarkeit({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [datum, setDatum] = useState("");
+function StepFreelancerVerfuegbarkeit({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: { verfuegbarkeit: string | null; verfuegbar_ab: string };
+  onNext: (data: { verfuegbarkeit: string; verfuegbar_ab: string }) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string | null>(initial.verfuegbarkeit);
+  const [datum, setDatum] = useState(initial.verfuegbar_ab);
   const isValid = selected !== null && (selected !== "datum" || datum.trim().length > 0);
   return (
     <div className="w-full max-w-lg flex flex-col items-center">
@@ -560,7 +697,11 @@ function StepFreelancerVerfuegbarkeit({ onNext, onBack }: { onNext: () => void; 
           </div>
         ))}
       </div>
-      <NavButtons onNext={onNext} onBack={onBack} nextDisabled={!isValid} />
+      <NavButtons
+        onNext={() => selected && onNext({ verfuegbarkeit: selected, verfuegbar_ab: datum })}
+        onBack={onBack}
+        nextDisabled={!isValid}
+      />
     </div>
   );
 }
@@ -700,43 +841,141 @@ function StepWillkommen({ rolle }: { rolle: Rolle }) {
 
 export function OnboardingForm() {
   const [step, setStep] = useState(0);
-  const [rolle, setRolle] = useState<Rolle | null>(null);
+  const [data, setData] = useState<OnboardingData>(defaultData);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const next = () => setStep(s => s + 1);
   const back = () => setStep(s => s - 1);
 
-  const totalSteps = rolle === "freelancer" ? 7 : 6;
+  // Advance to next step, optionally merging data updates.
+  // On the last step before Welcome, triggers the server action instead.
+  const advance = (updates?: Partial<OnboardingData>) => {
+    const merged = updates ? { ...data, ...updates } : data;
+    setData(merged);
+
+    const nextStep = step + 1;
+    const willBeWelcome =
+      (merged.rolle === "unternehmen" && nextStep === 6) ||
+      (merged.rolle === "freelancer" && nextStep === 7);
+
+    if (willBeWelcome) {
+      setSubmitError(null);
+      startTransition(async () => {
+        const result = await onboarding({
+          rolle: merged.rolle as "unternehmen" | "freelancer",
+          anzeigename: merged.anzeigename,
+          firmenname: merged.firmenname || undefined,
+          branche: merged.branche ?? undefined,
+          unternehmensgroesse: merged.unternehmensgroesse ?? undefined,
+          gesuchte_leistungen: merged.gesuchte_leistungen,
+          dringlichkeit: merged.dringlichkeit ?? undefined,
+          spezialisierungen: merged.spezialisierungen,
+          branchen_erfahrung: merged.branchen_erfahrung,
+          erfahrung_jahre: merged.erfahrung_jahre || undefined,
+          bio: merged.bio || undefined,
+          verfuegbarkeit: merged.verfuegbarkeit ?? undefined,
+          verfuegbar_ab: merged.verfuegbar_ab || undefined,
+        });
+        if (result.error) {
+          setSubmitError(result.error);
+        } else {
+          setStep(nextStep);
+        }
+      });
+    } else {
+      setStep(nextStep);
+    }
+  };
+
+  const totalSteps = data.rolle === "freelancer" ? 7 : 6;
   const isWelcome =
-    (rolle === "unternehmen" && step === 6) ||
-    (rolle === "freelancer" && step === 7);
+    (data.rolle === "unternehmen" && step === 6) ||
+    (data.rolle === "freelancer" && step === 7);
 
   const renderStep = () => {
-    if (isWelcome) return <StepWillkommen rolle={rolle!} />;
+    if (isWelcome) return <StepWillkommen rolle={data.rolle!} />;
     switch (step) {
       case 0:
-        return <StepRolleAuswahl selected={rolle} onSelect={r => setRolle(r)} onNext={next} />;
+        return (
+          <StepRolleAuswahl
+            selected={data.rolle}
+            onSelect={r => setData(prev => ({ ...prev, rolle: r }))}
+            onNext={() => advance()}
+          />
+        );
       case 1:
-        return <StepProfilSetup rolle={rolle!} onNext={next} onBack={back} />;
+        return (
+          <StepProfilSetup
+            rolle={data.rolle!}
+            initial={{ anzeigename: data.anzeigename, firmenname: data.firmenname }}
+            onNext={d => advance(d)}
+            onBack={back}
+          />
+        );
       case 2:
-        return rolle === "unternehmen"
-          ? <StepUnternehmenBranche onNext={next} onBack={back} />
-          : <StepFreelancerSpezialisierung onNext={next} onBack={back} />;
+        return data.rolle === "unternehmen" ? (
+          <StepUnternehmenBranche
+            initial={data.branche}
+            onNext={branche => advance({ branche })}
+            onBack={back}
+          />
+        ) : (
+          <StepFreelancerSpezialisierung
+            initial={data.spezialisierungen}
+            onNext={spezialisierungen => advance({ spezialisierungen })}
+            onBack={back}
+          />
+        );
       case 3:
-        return rolle === "unternehmen"
-          ? <StepUnternehmenGroesse onNext={next} onBack={back} />
-          : <StepFreelancerBranchen onNext={next} onBack={back} />;
+        return data.rolle === "unternehmen" ? (
+          <StepUnternehmenGroesse
+            initial={data.unternehmensgroesse}
+            onNext={unternehmensgroesse => advance({ unternehmensgroesse })}
+            onBack={back}
+          />
+        ) : (
+          <StepFreelancerBranchen
+            initial={data.branchen_erfahrung}
+            onNext={branchen_erfahrung => advance({ branchen_erfahrung })}
+            onBack={back}
+          />
+        );
       case 4:
-        return rolle === "unternehmen"
-          ? <StepUnternehmenLeistungen onNext={next} onBack={back} />
-          : <StepFreelancerBio onNext={next} onBack={back} />;
+        return data.rolle === "unternehmen" ? (
+          <StepUnternehmenLeistungen
+            initial={data.gesuchte_leistungen}
+            onNext={gesuchte_leistungen => advance({ gesuchte_leistungen })}
+            onBack={back}
+          />
+        ) : (
+          <StepFreelancerBio
+            initial={{ erfahrung_jahre: data.erfahrung_jahre, bio: data.bio }}
+            onNext={d => advance(d)}
+            onBack={back}
+          />
+        );
       case 5:
-        return rolle === "unternehmen"
-          ? <StepUnternehmenDringlichkeit onNext={next} onBack={back} />
-          : <StepFreelancerVerfuegbarkeit onNext={next} onBack={back} />;
+        return data.rolle === "unternehmen" ? (
+          <StepUnternehmenDringlichkeit
+            initial={data.dringlichkeit}
+            onNext={dringlichkeit => advance({ dringlichkeit })}
+            onBack={back}
+          />
+        ) : (
+          <StepFreelancerVerfuegbarkeit
+            initial={{ verfuegbarkeit: data.verfuegbarkeit, verfuegbar_ab: data.verfuegbar_ab }}
+            onNext={d => advance(d)}
+            onBack={back}
+          />
+        );
       case 6:
-        return rolle === "freelancer"
-          ? <StepFreelancerPortfolio onNext={next} onBack={back} onSkip={next} />
-          : null;
+        return data.rolle === "freelancer" ? (
+          <StepFreelancerPortfolio
+            onNext={() => advance()}
+            onBack={back}
+            onSkip={() => advance()}
+          />
+        ) : null;
       default:
         return null;
     }
@@ -748,7 +987,19 @@ export function OnboardingForm() {
       <OnboardingHeader />
       <main className="flex-1 flex flex-col items-center justify-center px-6 pt-28 pb-16 z-10 relative">
         {!isWelcome && <StepIndicator current={step + 1} total={totalSteps} />}
-        {renderStep()}
+        {submitError && (
+          <div className="w-full max-w-lg mb-6 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 text-center">
+            {submitError}
+          </div>
+        )}
+        {isPending ? (
+          <div className="flex flex-col items-center gap-4 text-[#dfc0b7]">
+            <div className="w-8 h-8 border-2 border-[#D95D39] border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm tracking-wide">Wird gespeichert…</span>
+          </div>
+        ) : (
+          renderStep()
+        )}
       </main>
     </div>
   );

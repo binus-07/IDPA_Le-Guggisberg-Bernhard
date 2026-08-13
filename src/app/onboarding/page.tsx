@@ -7,8 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OnboardingPage() {
-  // TODO: re-enable before go-live
-  // await enforceRouteGuard("/onboarding");
+  await enforceRouteGuard("/onboarding");
 
   return <OnboardingForm />;
 }
