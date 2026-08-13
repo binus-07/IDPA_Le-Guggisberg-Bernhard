@@ -80,9 +80,15 @@ export function AppShell({ rolle, children }: { rolle: Rolle | null; children: R
           </ul>
         </nav>
         <div className="relative">
+          {/*
+            Bewusst kein role="menu"/"menuitem": das ARIA-Menu-Pattern verlangt
+            Pfeiltasten-Navigation zwischen den Eintraegen, die dieses simple
+            Ein-Aktion-Popover nicht implementiert -- die impliziten button-Rollen sind hier
+            korrekter als ein unvollstaendiges ARIA-Widget.
+          */}
           <button
             type="button"
-            aria-haspopup="menu"
+            aria-haspopup="true"
             aria-expanded={kontoMenuOffen}
             aria-label="Konto-Menue"
             onClick={() => setKontoMenuOffen((offen) => !offen)}
@@ -94,14 +100,10 @@ export function AppShell({ rolle, children }: { rolle: Rolle | null; children: R
             <User aria-hidden="true" />
           </button>
           {kontoMenuOffen ? (
-            <div
-              role="menu"
-              className="absolute top-[calc(100%+8px)] right-0 min-w-40 rounded-lg bg-card p-2 shadow-none"
-            >
+            <div className="absolute top-[calc(100%+8px)] right-0 min-w-40 rounded-lg bg-card p-2 shadow-none">
               <form action={signOut}>
                 <button
                   type="submit"
-                  role="menuitem"
                   className={cn(
                     "text-body w-full rounded-sm px-3 py-2 text-left text-foreground hover:bg-muted/50",
                     FOKUS_RING,

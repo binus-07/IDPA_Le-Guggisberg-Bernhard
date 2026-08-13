@@ -27,8 +27,11 @@ test("Registrieren -> Rolle waehlen -> Dashboard -> Logout -> erneut anmelden oh
   await page.getByRole("button", { name: /^Freelancer/ }).click();
 
   await expect(page).toHaveURL("/dashboard/freelancer");
-  await expect(page.getByText("Rolle: Freelancer")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Meine Projekte" })).toBeVisible();
 
+  // Abmelden ist im Mockup nicht vorgesehen und haengt deshalb hinter dem Avatar-Menue
+  // (siehe AppShell/PR-Beschreibung) -- erst oeffnen, dann klicken.
+  await page.getByRole("button", { name: "Konto-Menue" }).click();
   await page.getByRole("button", { name: "Abmelden" }).click();
   await expect(page).toHaveURL("/anmelden");
 
@@ -39,5 +42,5 @@ test("Registrieren -> Rolle waehlen -> Dashboard -> Logout -> erneut anmelden oh
   // Onboarding wird NICHT erneut angezeigt -- die Login-Action leitet direkt ins passende
   // Dashboard weiter, weil das Profil bereits eine Rolle hat.
   await expect(page).toHaveURL("/dashboard/freelancer");
-  await expect(page.getByText("Rolle: Freelancer")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Meine Projekte" })).toBeVisible();
 });
