@@ -1,0 +1,32 @@
+import { expect, test } from "@playwright/test";
+
+function eindeutigeEmail(): string {
+  return `e2e-marketing-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
+}
+
+test("Dashboard Unternehmen -> Marketing Planung -> Freelancer-Detail", async ({ page }) => {
+  const email = eindeutigeEmail();
+  const password = "sicheres-testpasswort";
+
+  await page.goto("/registrieren");
+  await page.getByLabel("E-Mail").fill(email);
+  await page.getByLabel("Passwort").fill(password);
+  await page.getByRole("button", { name: "Registrieren" }).click();
+
+  await expect(page).toHaveURL("/onboarding");
+  await page.getByLabel("Anzeigename").fill("E2E Unternehmen");
+  await page.getByRole("button", { name: /^Unternehmen/ }).click();
+
+  await expect(page).toHaveURL("/dashboard/unternehmen");
+  await page.getByRole("link", { name: "Plan erstellen" }).first().click();
+
+  await expect(page).toHaveURL("/marketing-planung");
+  await expect(
+    page.getByRole("heading", { name: "Wählen Sie einen passenden Freelancer aus" }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: /Hannes/ }).click();
+
+  await expect(page).toHaveURL("/freelancer/hannes");
+  await expect(page.getByText("Hannes")).toBeVisible();
+});
