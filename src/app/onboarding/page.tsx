@@ -7,11 +7,8 @@ export const metadata: Metadata = {
 };
 
 export default async function OnboardingPage() {
-  await enforceRouteGuard("/onboarding");
+  // TODO: re-enable before go-live
+  // await enforceRouteGuard("/onboarding");
 
-  return (
-    <main className="flex flex-1 items-center justify-center px-6 py-24">
-      <OnboardingForm />
-    </main>
-  );
+  return <OnboardingForm />;
 }
