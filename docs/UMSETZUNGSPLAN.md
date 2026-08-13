@@ -36,15 +36,14 @@ Die Phasen bauen aufeinander auf. Erst wenn das Grundgerüst (Phase A–C) steht
 - [x] GitHub-Organisation/Repo anlegen (Struktur siehe Abschnitt 2)
 - [x] Next.js-Projekt mit TypeScript + App Router aufsetzen (`create-next-app`)
 - [x] ESLint + Prettier konfigurieren, damit alle gleich formatieren
-- [ ] Netlify mit dem Repo verbinden, erstes Deployment von `main` testen — manueller Schritt,
-      siehe [`docs/manuelle-schritte.md`](manuelle-schritte.md); `netlify.toml` ist vorbereitet
-- [ ] Supabase-Projekt erstellen, Verbindung via `@supabase/ssr` einrichten (Server Components, Cookies, Sessions testen) —
-      Code (Clients, Proxy, Health-Route) ist fertig und getestet (gemockt), das eigentliche
-      Supabase-Projekt fehlt noch (manueller Schritt, siehe [`docs/manuelle-schritte.md`](manuelle-schritte.md))
+- [x] Netlify mit dem Repo verbinden, erstes Deployment von `main` testen — erledigt, siehe
+      [`docs/manuelle-schritte.md`](manuelle-schritte.md); `netlify.toml` war vorbereitet
+- [x] Supabase-Projekt erstellen, Verbindung via `@supabase/ssr` einrichten (Server Components, Cookies, Sessions testen) —
+      erledigt, siehe [`docs/manuelle-schritte.md`](manuelle-schritte.md)
 - [x] Entscheidung UI-System treffen (Tailwind + shadcn/ui prüfen) → **ADR schreiben** (siehe Abschnitt 3)
-- [ ] Timon: Design-Tokens aus Figma ableiten (Farben, Typografie – Anton für Titel, Inter für Text, 8px-Radius gemäss Mockup) —
-      technische Umsetzung der vorgegebenen Werte (Anton/Inter/8px) ist in `src/app/globals.css`
-      bereits vorbereitet; Ableitung aus dem tatsächlichen Figma-Mockup steht noch aus
+- [x] Timon: Design-Tokens aus Adobe XD ableiten (Farben, Typografie – Anton für Titel, Inter für
+      Text, 8px-Radius gemäss Mockup) — Mockup war Adobe XD statt Figma (siehe ADR 006), Tokens
+      sind vollständig in `src/app/globals.css` umgesetzt
 
 **Meilenstein A:** "Hello World" läuft deployed auf Netlify und kann Daten aus Supabase lesen.
 
