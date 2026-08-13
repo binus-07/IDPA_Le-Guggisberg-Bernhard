@@ -38,6 +38,24 @@ export const onboardingSchema = z.object({
   anzeigename: anzeigenameSchema,
 });
 
+export const onboardingFullSchema = z.object({
+  rolle: z.enum(["unternehmen", "freelancer"], "Bitte eine Rolle waehlen"),
+  anzeigename: anzeigenameSchema,
+  firmenname: z.string().max(120).optional(),
+  // Unternehmen
+  branche: z.string().optional(),
+  unternehmensgroesse: z.string().optional(),
+  gesuchte_leistungen: z.array(z.string()).optional(),
+  dringlichkeit: z.string().optional(),
+  // Freelancer
+  spezialisierungen: z.array(z.string()).optional(),
+  branchen_erfahrung: z.array(z.string()).optional(),
+  erfahrung_jahre: z.string().optional(),
+  bio: z.string().max(300, "Die Bio darf hoechstens 300 Zeichen lang sein").optional(),
+  verfuegbarkeit: z.string().optional(),
+  verfuegbar_ab: z.string().optional(),
+});
+
 export const passwortVergessenSchema = z.object({
   email: emailSchema,
 });

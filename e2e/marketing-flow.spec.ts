@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { onboardingDurchlaufen } from "./helpers/onboarding";
 
 function eindeutigeEmail(): string {
   return `e2e-marketing-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
@@ -14,8 +15,7 @@ test("Dashboard Unternehmen -> Marketing Planung -> Freelancer-Detail", async ({
   await page.getByRole("button", { name: "Registrieren" }).click();
 
   await expect(page).toHaveURL("/onboarding");
-  await page.getByLabel("Anzeigename").fill("E2E Unternehmen");
-  await page.getByRole("button", { name: /^Unternehmen/ }).click();
+  await onboardingDurchlaufen(page, "unternehmen", "E2E Unternehmen");
 
   await expect(page).toHaveURL("/dashboard/unternehmen");
   await page.getByRole("link", { name: "Plan erstellen" }).first().click();
