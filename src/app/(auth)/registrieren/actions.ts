@@ -32,7 +32,7 @@ export async function registrieren(
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/onboarding`,
+      emailRedirectTo: `${origin}/auth/confirm?next=/email-bestaetigt`,
     },
   });
 
