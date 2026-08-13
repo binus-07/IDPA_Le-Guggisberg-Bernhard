@@ -71,14 +71,14 @@ describe("anzeigenameSchema", () => {
 
 describe("onboardingSchema", () => {
   it("akzeptiert eine gueltige Rolle mit Anzeigename", () => {
-    expect(
-      onboardingSchema.safeParse({ rolle: "freelancer", anzeigename: "Linus" }).success,
-    ).toBe(true);
+    expect(onboardingSchema.safeParse({ rolle: "freelancer", anzeigename: "Linus" }).success).toBe(
+      true,
+    );
   });
 
   it("lehnt eine unbekannte Rolle ab (z. B. admin ist im Onboarding nicht waehlbar)", () => {
-    expect(
-      onboardingSchema.safeParse({ rolle: "admin", anzeigename: "Linus" }).success,
-    ).toBe(false);
+    expect(onboardingSchema.safeParse({ rolle: "admin", anzeigename: "Linus" }).success).toBe(
+      false,
+    );
   });
 });

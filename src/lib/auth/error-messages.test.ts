@@ -26,7 +26,9 @@ describe("translateAuthError", () => {
   });
 
   it("gibt die Fallback-Meldung zurück, wenn kein Error vorhanden ist", () => {
-    expect(translateAuthError(null)).toBe("Etwas ist schiefgelaufen. Bitte versuche es später erneut.");
+    expect(translateAuthError(null)).toBe(
+      "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+    );
     expect(translateAuthError(undefined)).toBe(
       "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
     );

@@ -19,8 +19,8 @@ export function RegistrierenForm() {
         <CardHeader>
           <CardTitle className="font-heading text-2xl">Fast geschafft</CardTitle>
           <CardDescription>
-            Wir haben dir eine E-Mail geschickt. Bitte bestätige deine Adresse über den Link
-            darin, um die Registrierung abzuschliessen.
+            Wir haben dir eine E-Mail geschickt. Bitte bestätige deine Adresse über den Link darin,
+            um die Registrierung abzuschliessen.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -31,7 +31,9 @@ export function RegistrierenForm() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="font-heading text-2xl">Registrieren</CardTitle>
-        <CardDescription>Erstelle ein Konto für die Marketing-Freelancer-Plattform.</CardDescription>
+        <CardDescription>
+          Erstelle ein Konto für die Marketing-Freelancer-Plattform.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-4">

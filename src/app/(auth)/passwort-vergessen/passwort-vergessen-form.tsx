@@ -19,8 +19,8 @@ export function PasswortVergessenForm() {
         <CardHeader>
           <CardTitle className="font-heading text-2xl">E-Mail unterwegs</CardTitle>
           <CardDescription>
-            Falls ein Konto mit dieser Adresse existiert, haben wir einen Link zum Zurücksetzen
-            des Passworts geschickt.
+            Falls ein Konto mit dieser Adresse existiert, haben wir einen Link zum Zurücksetzen des
+            Passworts geschickt.
           </CardDescription>
         </CardHeader>
       </Card>
