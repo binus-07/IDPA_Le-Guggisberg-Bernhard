@@ -1,19 +1,48 @@
+import Link from "next/link";
+import { BildKarte } from "@/components/bild-karte";
+import { Button } from "@/components/ui/button";
+import { Kugel } from "@/components/kugel";
+import { getKategorien } from "@/lib/mock/kategorien";
+
 export default function Home() {
+  const kategorien = getKategorien();
+
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-6 bg-background px-6 py-24 text-foreground">
-      <div className="flex max-w-md flex-col items-center gap-4 rounded-lg border border-border bg-card p-8 text-center text-card-foreground shadow-sm">
-        <h1 className="font-heading text-4xl uppercase tracking-wide">Hello World</h1>
-        <p className="font-sans text-base text-muted-foreground">
-          IDPA Marketing-Freelancer-Plattform &ndash; Phase A Fundament. Diese Seite nutzt die
-          Design-Tokens: Anton fuer Titel, Inter fuer Fliesstext, 8px Border-Radius.
-        </p>
-        <button
-          type="button"
-          className="rounded-lg bg-primary px-5 py-2 font-sans text-sm font-medium text-primary-foreground transition-colors hover:opacity-90"
-        >
-          Los geht&apos;s
-        </button>
+    <div className="relative flex flex-1 flex-col">
+      <Kugel />
+      <div className="relative z-[1] mx-auto flex w-full max-w-[1680px] flex-col gap-24 px-6 pt-16 pb-24 md:px-10 lg:px-16 xl:px-[131px]">
+        <section className="flex flex-col gap-8">
+          <h1 className="text-display leading-[1.49] text-foreground">
+            <span className="block">Marketing-Freelancer</span>
+            <span className="block">einfach finden</span>
+          </h1>
+          <p className="text-lead max-w-xl text-foreground">
+            Unternehmen und Freelancer der Marketingbranche an einem Ort.
+          </p>
+          <p className="text-body-light max-w-2xl text-foreground">
+            Unternehmen finden hier gezielt Freelancer:innen für Fotografie, Grafik, Content
+            Creation und mehr. Freelancer präsentieren ihr Portfolio und erhalten passende Anfragen
+            – ohne Umwege über eine Agentur.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Button asChild>
+              <Link href="/registrieren">Registrieren</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/anmelden">Anmelden</Link>
+            </Button>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-8">
+          <h2 className="text-section-label text-foreground">Freelancer-Kategorien</h2>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {kategorien.map((kategorie) => (
+              <BildKarte key={kategorie.id} label={kategorie.name} bildAlt="" />
+            ))}
+          </div>
+        </section>
       </div>
-    </main>
+    </div>
   );
 }
