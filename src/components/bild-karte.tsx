@@ -27,8 +27,11 @@ export function BildKarte({
   href?: string;
   bildAlt: string;
 }) {
+  // min-w-0 ist noetig, weil dies direkte Grid-Kinder sind: ohne die Klasse verhindert Grids
+  // implizites min-width:auto den Umbruch langer Woerter (z. B. "Webprogrammierung") -- der Text
+  // ueberlaeuft dann in die Nachbarspalte statt zweizeilig zu brechen.
   const inhalt = (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full min-w-0 flex-col gap-3">
       <PlatzhalterBild alt={bildAlt} radius="image" className="aspect-[252/354] w-full" />
       <p className={cn("font-sans font-normal text-foreground text-center", labelGroesse(label))}>
         {label}
@@ -38,7 +41,7 @@ export function BildKarte({
 
   if (href) {
     return (
-      <Link href={href} className={cn("block h-full", FOKUS)}>
+      <Link href={href} className={cn("block h-full min-w-0", FOKUS)}>
         {inhalt}
       </Link>
     );

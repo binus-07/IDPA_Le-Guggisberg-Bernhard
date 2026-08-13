@@ -12,7 +12,7 @@ export function FreelancerKarteKompakt({ freelancer }: { freelancer: Freelancer 
   return (
     <Link
       href={`/freelancer/${freelancer.id}`}
-      className="flex flex-col gap-3 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="flex min-w-0 flex-col gap-3 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <div className="relative">
         <PlatzhalterBild

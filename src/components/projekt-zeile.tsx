@@ -18,7 +18,7 @@ export function ProjektZeile({ projekt }: { projekt: Projekt }) {
         radius="image"
         className="aspect-[352/218] w-full max-w-[280px] shrink-0 sm:max-w-[352px]"
       />
-      <div className="flex flex-1 flex-col justify-center gap-3">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-3">
         <p className="text-row-title text-foreground">{projekt.titel}</p>
         <p className="text-body-light line-clamp-2 text-foreground">
           {projekt.auftragsbeschreibung}

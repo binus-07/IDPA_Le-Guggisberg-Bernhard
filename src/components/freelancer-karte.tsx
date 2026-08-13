@@ -12,7 +12,7 @@ export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
   return (
     <Link
       href={`/freelancer/${freelancer.id}`}
-      className="flex h-full flex-col gap-6 rounded-lg bg-card p-7 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="flex h-full min-w-0 flex-col gap-6 rounded-lg bg-card p-7 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <div className="flex items-start gap-4">
         <div className="relative shrink-0">
@@ -28,7 +28,7 @@ export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
             </span>
           ) : null}
         </div>
-        <div className="flex flex-col gap-1 pt-1">
+        <div className="flex min-w-0 flex-col gap-1 pt-1">
           <p className="text-name text-foreground">{freelancer.name}</p>
           <p className="text-body-lg text-muted-foreground">{freelancer.rolle}</p>
           {freelancer.seitJahren ? (
