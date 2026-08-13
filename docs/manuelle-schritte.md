@@ -87,6 +87,50 @@ erwartet stattdessen `token_hash` + `type` als Query-Parameter direkt an
 4. Speichern, danach eine echte Test-Registrierung durchführen und die tatsächlich empfangene
    Mail-URL kontrollieren (`token_hash`-Parameter vorhanden, Link zeigt auf `/auth/confirm`).
 
+## 6. Transparente Kugelgrafik aus Adobe XD exportieren
+
+`src/components/kugel.tsx` referenziert `/sphere.webp` in `public/`. Die Datei liegt noch nicht im
+Repo. Timon muss sie aus dem Adobe-XD-Mockup transparent (nicht mit schwarzem Hintergrund, wie der
+aktuelle Stand) als WebP exportieren und unter `public/sphere.webp` ablegen.
+
+1. In Adobe XD die Punktkugel-Grafik selektieren.
+2. Beim Export sicherstellen, dass der Hintergrund transparent ist (Format PNG mit Alphakanal
+   exportieren, danach nach WebP konvertieren — oder direkt als WebP mit Transparenz, falls das
+   XD-Exportdialog das unterstützt).
+3. Datei als `sphere.webp` in `public/` ablegen (Repo-Root, nicht `public/mock/`).
+4. Danach eine beliebige Seite mit App-Shell oder Auth-Layout (z. B. `/dashboard/unternehmen`,
+   `/anmelden`) im Browser prüfen: die Kugel muss oben rechts sichtbar sein, mit erkennbarem
+   Bildinhalt statt einer schwarzen Fläche.
+
+Ohne diesen Schritt bleibt die Kugel unsichtbar (das `<img>`-Element blendet sich bei Ladefehler
+selbst aus, siehe `Kugel`-Komponente) — das Layout bricht nicht, wirkt aber unvollständig.
+
+## 7. Lizenzfreie Bilder für Freelancer-Portraits, Kategorien, Projekte nachliefern
+
+Alle Bildflächen (Freelancer-Portraits, Kategorie-Kacheln, Projekt-Banner, Teilaufgaben-Bilder)
+zeigen aktuell `PlatzhalterBild` — eine farbige Fläche in der gedämpften Mockup-Farbe statt eines
+echten Bilds. Das ist Absicht (siehe `docs/adr/006-design-system-dark-theme.md`): weder externe
+Bild-URLs noch Bilder unklarer Herkunft aus dem Mockup selbst sollten ohne Lizenzklärung ins Repo.
+
+Timon muss lizenzfreie Bilder (z. B. Unsplash, Pexels — beide mit Angaben zur Weiterverwendung
+ohne Bildnachweis-Pflicht, aber Quelle trotzdem für die IDPA-Dokumentation festhalten) besorgen und
+unter `public/mock/` ablegen:
+
+- Freelancer-Portraits (mind. die 7 aus `src/lib/mock/freelancer.ts`, idealerweise auch die 4
+  zusätzlichen Top-Freelancer-only-Einträge)
+- 6 Kategorie-Bilder (Videografie, Webprogrammierung, Fotografie, Content Creation, Print Grafik,
+  Web Grafik)
+- 1 Projekt-Banner (Brack.alltron) + 3 Teilaufgaben-Bilder
+- 3 "Bisherige Projekte"-Bilder für Thomas Wenger
+
+Für die IDPA-Quellenangabe: pro Bild Quelle/Lizenz/Urheber in einer eigenen Tabelle festhalten
+(z. B. `docs/bildquellen.md`), auch wenn die jeweilige Lizenz keinen sichtbaren Bildnachweis
+verlangt — die Wegleitung verlangt die Angabe unabhängig davon.
+
+Sobald die Bilder vorliegen, ersetzt `PlatzhalterBild` in den jeweiligen Komponenten ein normales
+`<img>`/`next/image` mit `src="/mock/<dateiname>"` — das ist ein rein technischer Folgeschritt,
+kein weiterer manueller Eingriff nötig.
+
 ## Offene Punkte nach diesen Schritten
 
 - [x] Supabase-Projekt erstellt und Credentials in `.env.local` (lokal) und Netlify (Produktion)
@@ -99,3 +143,5 @@ erwartet stattdessen `token_hash` + `type` als Query-Parameter direkt an
       nicht)
 - [ ] E-Mail-Vorlagen ("Confirm signup", "Reset Password") auf `/auth/confirm` umgestellt —
       ohne diesen Schritt bleibt die E-Mail-Bestätigung defekt, siehe Abschnitt 5 oben
+- [ ] Transparente Kugelgrafik (`public/sphere.webp`) aus Adobe XD exportiert, siehe Abschnitt 6
+- [ ] Lizenzfreie Bilder für `public/mock/` besorgt und Quellen dokumentiert, siehe Abschnitt 7

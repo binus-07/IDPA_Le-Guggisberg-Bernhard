@@ -219,19 +219,45 @@ function ChipGrid({
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const LEISTUNGEN = [
-  "Fotografie", "Videografie", "Content Creation", "Web Grafik",
-  "Print Grafik", "Webprogrammierung", "Social Media", "Copywriting",
+  "Fotografie",
+  "Videografie",
+  "Content Creation",
+  "Web Grafik",
+  "Print Grafik",
+  "Webprogrammierung",
+  "Social Media",
+  "Copywriting",
 ];
 const LEISTUNGEN_ICONS = [
-  "photo_camera", "videocam", "draw", "web", "print", "code", "share", "edit_note",
+  "photo_camera",
+  "videocam",
+  "draw",
+  "web",
+  "print",
+  "code",
+  "share",
+  "edit_note",
 ];
 
 const BRANCHEN = [
-  "Beauty & Lifestyle", "Tech & Software", "Food & Gastro", "Mode & Fashion",
-  "Immobilien", "Finance", "Gesundheit", "Sport",
+  "Beauty & Lifestyle",
+  "Tech & Software",
+  "Food & Gastro",
+  "Mode & Fashion",
+  "Immobilien",
+  "Finance",
+  "Gesundheit",
+  "Sport",
 ];
 const BRANCHEN_ICONS = [
-  "spa", "computer", "restaurant", "style", "apartment", "payments", "health_and_safety", "fitness_center",
+  "spa",
+  "computer",
+  "restaurant",
+  "style",
+  "apartment",
+  "payments",
+  "health_and_safety",
+  "fitness_center",
 ];
 
 // ─── Step 0: Rollenauswahl ─────────────────────────────────────────────────────
@@ -246,8 +272,18 @@ function StepRolleAuswahl({
   onNext: () => void;
 }) {
   const cards: { value: Rolle; icon: string; title: string; desc: string }[] = [
-    { value: "unternehmen", icon: "business", title: "Unternehmen", desc: "Ich suche Marketing-Freelancer für meine Projekte." },
-    { value: "freelancer", icon: "person", title: "Freelancer", desc: "Ich biete Marketing-Leistungen an." },
+    {
+      value: "unternehmen",
+      icon: "business",
+      title: "Unternehmen",
+      desc: "Ich suche Marketing-Freelancer für meine Projekte.",
+    },
+    {
+      value: "freelancer",
+      icon: "person",
+      title: "Freelancer",
+      desc: "Ich biete Marketing-Leistungen an.",
+    },
   ];
   return (
     <div className="w-full max-w-4xl flex flex-col items-center">
@@ -258,7 +294,7 @@ function StepRolleAuswahl({
         Wähle deine Rolle — du kannst sie später nicht mehr ändern.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-12">
-        {cards.map(c => (
+        {cards.map((c) => (
           <button
             key={c.value}
             onClick={() => onSelect(c.value)}
@@ -324,7 +360,7 @@ function StepProfilSetup({
             <input
               type="text"
               value={anzeigename}
-              onChange={e => setAnzeigename(e.target.value)}
+              onChange={(e) => setAnzeigename(e.target.value)}
               placeholder="Dein Name auf der Plattform"
               maxLength={80}
               className="w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] placeholder-[#58423c] focus:border-[#D95D39] focus:outline-none transition-colors"
@@ -338,7 +374,7 @@ function StepProfilSetup({
               <input
                 type="text"
                 value={firmenname}
-                onChange={e => setFirmenname(e.target.value)}
+                onChange={(e) => setFirmenname(e.target.value)}
                 placeholder="Name deines Unternehmens"
                 maxLength={120}
                 className="w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] placeholder-[#58423c] focus:border-[#D95D39] focus:outline-none transition-colors"
@@ -426,7 +462,7 @@ function StepUnternehmenGroesse({
         Wie gross ist euer Unternehmen?
       </h1>
       <div className="flex flex-col gap-3 w-full">
-        {GROESSEN.map(opt => (
+        {GROESSEN.map((opt) => (
           <RadioCard
             key={opt.label}
             label={opt.label}
@@ -458,7 +494,7 @@ function StepUnternehmenLeistungen({
 }) {
   const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
-    setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
+    setSelected((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
@@ -467,7 +503,12 @@ function StepUnternehmenLeistungen({
       <p className="text-[#dfc0b7] text-base mb-10 text-center">
         Wähle alle Bereiche aus, in denen du aktuell oder zukünftig Unterstützung benötigst.
       </p>
-      <ChipGrid options={LEISTUNGEN} selected={selected} onToggle={toggle} icons={LEISTUNGEN_ICONS} />
+      <ChipGrid
+        options={LEISTUNGEN}
+        selected={selected}
+        onToggle={toggle}
+        icons={LEISTUNGEN_ICONS}
+      />
       <NavButtons
         onNext={() => onNext(selected)}
         onBack={onBack}
@@ -505,7 +546,7 @@ function StepUnternehmenDringlichkeit({
         Dies hilft uns, die Verfügbarkeit passender Freelancer optimal abzustimmen.
       </p>
       <div className="flex flex-col gap-3 w-full">
-        {DRINGLICHKEIT.map(opt => (
+        {DRINGLICHKEIT.map((opt) => (
           <RadioCard
             key={opt.label}
             label={opt.label}
@@ -537,7 +578,7 @@ function StepFreelancerSpezialisierung({
 }) {
   const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
-    setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
+    setSelected((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
@@ -546,7 +587,12 @@ function StepFreelancerSpezialisierung({
       <p className="text-[#dfc0b7] text-base mb-10 text-center">
         Wähle deine Kernkompetenzen. Mindestens eine Auswahl erforderlich.
       </p>
-      <ChipGrid options={LEISTUNGEN} selected={selected} onToggle={toggle} icons={LEISTUNGEN_ICONS} />
+      <ChipGrid
+        options={LEISTUNGEN}
+        selected={selected}
+        onToggle={toggle}
+        icons={LEISTUNGEN_ICONS}
+      />
       <NavButtons
         onNext={() => onNext(selected)}
         onBack={onBack}
@@ -569,7 +615,7 @@ function StepFreelancerBranchen({
 }) {
   const [selected, setSelected] = useState<string[]>(initial);
   const toggle = (v: string) =>
-    setSelected(prev => (prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]));
+    setSelected((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
@@ -614,10 +660,12 @@ function StepFreelancerBio({
             <div className="relative">
               <select
                 value={erfahrung}
-                onChange={e => setErfahrung(e.target.value)}
+                onChange={(e) => setErfahrung(e.target.value)}
                 className="w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] appearance-none focus:border-[#D95D39] focus:outline-none transition-colors cursor-pointer"
               >
-                <option value="" disabled>Erfahrung auswählen...</option>
+                <option value="" disabled>
+                  Erfahrung auswählen...
+                </option>
                 <option value="lt2">Weniger als 2 Jahre</option>
                 <option value="2-5">2–5 Jahre</option>
                 <option value="5-10">5–10 Jahre</option>
@@ -634,7 +682,7 @@ function StepFreelancerBio({
             </label>
             <textarea
               value={bio}
-              onChange={e => setBio(e.target.value.slice(0, 300))}
+              onChange={(e) => setBio(e.target.value.slice(0, 300))}
               placeholder="Beschreibe kurz deine Erfahrung und was dich ausmacht..."
               rows={5}
               className="w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] placeholder-[#58423c] focus:border-[#D95D39] focus:outline-none transition-colors resize-none"
@@ -655,9 +703,21 @@ function StepFreelancerBio({
 // ─── Step 5 (Freelancer): Verfügbarkeit ────────────────────────────────────────
 
 const VERFUEGBARKEIT = [
-  { value: "sofort", label: "Sofort verfügbar", description: "Ich bin bereit, direkt neue Projekte anzunehmen." },
-  { value: "datum", label: "Ab einem bestimmten Datum", description: "Ich werde ab einem bestimmten Datum verfügbar." },
-  { value: "anfrage", label: "Auf Anfrage", description: "Aktuell ausgelastet, aber offen für interessante Angebote." },
+  {
+    value: "sofort",
+    label: "Sofort verfügbar",
+    description: "Ich bin bereit, direkt neue Projekte anzunehmen.",
+  },
+  {
+    value: "datum",
+    label: "Ab einem bestimmten Datum",
+    description: "Ich werde ab einem bestimmten Datum verfügbar.",
+  },
+  {
+    value: "anfrage",
+    label: "Auf Anfrage",
+    description: "Aktuell ausgelastet, aber offen für interessante Angebote.",
+  },
 ];
 
 function StepFreelancerVerfuegbarkeit({
@@ -678,7 +738,7 @@ function StepFreelancerVerfuegbarkeit({
         Wann bist du verfügbar?
       </h1>
       <div className="flex flex-col gap-3 w-full">
-        {VERFUEGBARKEIT.map(opt => (
+        {VERFUEGBARKEIT.map((opt) => (
           <div key={opt.value}>
             <RadioCard
               label={opt.label}
@@ -690,7 +750,7 @@ function StepFreelancerVerfuegbarkeit({
               <input
                 type="date"
                 value={datum}
-                onChange={e => setDatum(e.target.value)}
+                onChange={(e) => setDatum(e.target.value)}
                 className="mt-2 w-full bg-[#0D0F14] border border-[#2D3139] rounded-xl px-4 py-3 text-[#e2e2e9] focus:border-[#D95D39] focus:outline-none transition-colors"
               />
             )}
@@ -722,10 +782,10 @@ function StepFreelancerPortfolio({
 
   const addFiles = (list: FileList | null) => {
     if (!list) return;
-    setFiles(prev => [...prev, ...Array.from(list)].slice(0, 3));
+    setFiles((prev) => [...prev, ...Array.from(list)].slice(0, 3));
   };
 
-  const removeFile = (i: number) => setFiles(prev => prev.filter((_, idx) => idx !== i));
+  const removeFile = (i: number) => setFiles((prev) => prev.filter((_, idx) => idx !== i));
 
   return (
     <div className="w-full max-w-lg flex flex-col items-center">
@@ -736,17 +796,25 @@ function StepFreelancerPortfolio({
         Optional — du kannst das später ergänzen.
       </p>
       <label
-        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
-        onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          addFiles(e.dataTransfer.files);
+        }}
         className={`w-full border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center gap-4 cursor-pointer transition-colors ${
           dragOver ? "border-[#D95D39] bg-[#D95D39]/5" : "border-[#2D3139] hover:border-[#D95D39]"
         }`}
       >
-        <span className="material-symbols-outlined text-[#dfc0b7] text-5xl leading-none">cloud_upload</span>
+        <span className="material-symbols-outlined text-[#dfc0b7] text-5xl leading-none">
+          cloud_upload
+        </span>
         <p className="text-[#dfc0b7] text-sm text-center">
-          Dateien hierher ziehen oder{" "}
-          <span className="text-[#D95D39] underline">auswählen</span>
+          Dateien hierher ziehen oder <span className="text-[#D95D39] underline">auswählen</span>
         </p>
         <p className="text-xs text-[#58423c]">Max. 3 Dateien · 10 MB · PDF, Bilder, Videos</p>
         <input
@@ -754,7 +822,7 @@ function StepFreelancerPortfolio({
           multiple
           accept="image/*,video/*,application/pdf"
           className="hidden"
-          onChange={e => addFiles(e.target.files)}
+          onChange={(e) => addFiles(e.target.files)}
         />
       </label>
       {files.length > 0 && (
@@ -807,11 +875,15 @@ function StepWillkommen({ rolle }: { rolle: Rolle }) {
       <div className="bg-[#1A1D24] border border-[#2D3139] rounded-xl p-6 w-full mb-12 hover:border-[#D95D39] transition-colors group text-left">
         <div className="flex items-center gap-6 mb-6">
           <div className="w-16 h-16 rounded-full bg-[#2D3139] border-2 border-[#2D3139] group-hover:border-[#D95D39] transition-colors flex-shrink-0 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#dfc0b7] text-3xl leading-none">person</span>
+            <span className="material-symbols-outlined text-[#dfc0b7] text-3xl leading-none">
+              person
+            </span>
           </div>
           <div>
             <h3 className="font-heading text-2xl text-[#e2e2e9] mb-1">Marc Müller</h3>
-            <p className="text-sm font-semibold text-[#D95D39] mb-1">Senior Performance Marketing</p>
+            <p className="text-sm font-semibold text-[#D95D39] mb-1">
+              Senior Performance Marketing
+            </p>
             <div className="flex items-center gap-1 text-sm text-[#dfc0b7]">
               <span className="material-symbols-outlined text-sm leading-none">work</span>
               <span>8 Jahre Erfahrung</span>
@@ -821,7 +893,9 @@ function StepWillkommen({ rolle }: { rolle: Rolle }) {
         <div className="border-t border-[#2D3139] pt-4 flex justify-between text-sm text-[#dfc0b7]">
           <span>Top bewertet</span>
           <span className="flex items-center gap-1 text-[#e2e2e9]">
-            <span className="material-symbols-outlined text-sm text-[#D95D39] leading-none">star</span>
+            <span className="material-symbols-outlined text-sm text-[#D95D39] leading-none">
+              star
+            </span>
             5.0
           </span>
         </div>
@@ -845,7 +919,7 @@ export function OnboardingForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const back = () => setStep(s => s - 1);
+  const back = () => setStep((s) => s - 1);
 
   // Advance to next step, optionally merging data updates.
   // On the last step before Welcome, triggers the server action instead.
@@ -889,8 +963,7 @@ export function OnboardingForm() {
 
   const totalSteps = data.rolle === "freelancer" ? 7 : 6;
   const isWelcome =
-    (data.rolle === "unternehmen" && step === 6) ||
-    (data.rolle === "freelancer" && step === 7);
+    (data.rolle === "unternehmen" && step === 6) || (data.rolle === "freelancer" && step === 7);
 
   const renderStep = () => {
     if (isWelcome) return <StepWillkommen rolle={data.rolle!} />;
@@ -899,7 +972,7 @@ export function OnboardingForm() {
         return (
           <StepRolleAuswahl
             selected={data.rolle}
-            onSelect={r => setData(prev => ({ ...prev, rolle: r }))}
+            onSelect={(r) => setData((prev) => ({ ...prev, rolle: r }))}
             onNext={() => advance()}
           />
         );
@@ -908,7 +981,7 @@ export function OnboardingForm() {
           <StepProfilSetup
             rolle={data.rolle!}
             initial={{ anzeigename: data.anzeigename, firmenname: data.firmenname }}
-            onNext={d => advance(d)}
+            onNext={(d) => advance(d)}
             onBack={back}
           />
         );
@@ -916,13 +989,13 @@ export function OnboardingForm() {
         return data.rolle === "unternehmen" ? (
           <StepUnternehmenBranche
             initial={data.branche}
-            onNext={branche => advance({ branche })}
+            onNext={(branche) => advance({ branche })}
             onBack={back}
           />
         ) : (
           <StepFreelancerSpezialisierung
             initial={data.spezialisierungen}
-            onNext={spezialisierungen => advance({ spezialisierungen })}
+            onNext={(spezialisierungen) => advance({ spezialisierungen })}
             onBack={back}
           />
         );
@@ -930,13 +1003,13 @@ export function OnboardingForm() {
         return data.rolle === "unternehmen" ? (
           <StepUnternehmenGroesse
             initial={data.unternehmensgroesse}
-            onNext={unternehmensgroesse => advance({ unternehmensgroesse })}
+            onNext={(unternehmensgroesse) => advance({ unternehmensgroesse })}
             onBack={back}
           />
         ) : (
           <StepFreelancerBranchen
             initial={data.branchen_erfahrung}
-            onNext={branchen_erfahrung => advance({ branchen_erfahrung })}
+            onNext={(branchen_erfahrung) => advance({ branchen_erfahrung })}
             onBack={back}
           />
         );
@@ -944,13 +1017,13 @@ export function OnboardingForm() {
         return data.rolle === "unternehmen" ? (
           <StepUnternehmenLeistungen
             initial={data.gesuchte_leistungen}
-            onNext={gesuchte_leistungen => advance({ gesuchte_leistungen })}
+            onNext={(gesuchte_leistungen) => advance({ gesuchte_leistungen })}
             onBack={back}
           />
         ) : (
           <StepFreelancerBio
             initial={{ erfahrung_jahre: data.erfahrung_jahre, bio: data.bio }}
-            onNext={d => advance(d)}
+            onNext={(d) => advance(d)}
             onBack={back}
           />
         );
@@ -958,13 +1031,13 @@ export function OnboardingForm() {
         return data.rolle === "unternehmen" ? (
           <StepUnternehmenDringlichkeit
             initial={data.dringlichkeit}
-            onNext={dringlichkeit => advance({ dringlichkeit })}
+            onNext={(dringlichkeit) => advance({ dringlichkeit })}
             onBack={back}
           />
         ) : (
           <StepFreelancerVerfuegbarkeit
             initial={{ verfuegbarkeit: data.verfuegbarkeit, verfuegbar_ab: data.verfuegbar_ab }}
-            onNext={d => advance(d)}
+            onNext={(d) => advance(d)}
             onBack={back}
           />
         );

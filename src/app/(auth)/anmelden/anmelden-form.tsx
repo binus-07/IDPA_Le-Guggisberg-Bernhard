@@ -19,10 +19,12 @@ export function AnmeldenForm({
   const [state, formAction, pending] = useActionState(anmelden, initialState);
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
       <CardHeader>
-        <CardTitle className="font-heading text-2xl">Anmelden</CardTitle>
-        <CardDescription>Melde dich mit deinem Konto an.</CardDescription>
+        <CardTitle className="text-h2 text-foreground">Anmelden</CardTitle>
+        <CardDescription className="text-body-light">
+          Melde dich mit deinem Konto an.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-4">
@@ -50,7 +52,7 @@ export function AnmeldenForm({
             {pending ? "Anmelden …" : "Anmelden"}
           </Button>
         </form>
-        <div className="mt-4 flex flex-col gap-1 text-sm text-muted-foreground">
+        <div className="text-body-light mt-4 flex flex-col gap-1 text-muted-foreground">
           <p>
             Noch kein Konto?{" "}
             <Link href="/registrieren" className="underline underline-offset-4">

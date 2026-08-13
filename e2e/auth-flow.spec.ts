@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { onboardingDurchlaufen } from "./helpers/onboarding";
 
 function eindeutigeEmail(): string {
   return `e2e-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
@@ -23,12 +24,14 @@ test("Registrieren -> Rolle waehlen -> Dashboard -> Logout -> erneut anmelden oh
   // "load"-Event aus, auf das waitForURL() standardmässig wartet. toHaveURL() pollt
   // dagegen den tatsächlichen URL-Zustand und ist damit fuer diesen Fall robust.
   await expect(page).toHaveURL("/onboarding");
-  await page.getByLabel("Anzeigename").fill("E2E Testperson");
-  await page.getByRole("button", { name: /^Freelancer/ }).click();
+  await onboardingDurchlaufen(page, "freelancer", "E2E Testperson");
 
   await expect(page).toHaveURL("/dashboard/freelancer");
-  await expect(page.getByText("Rolle: Freelancer")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Meine Projekte" })).toBeVisible();
 
+  // Abmelden ist im Mockup nicht vorgesehen und haengt deshalb hinter dem Avatar-Menue
+  // (siehe AppShell/PR-Beschreibung) -- erst oeffnen, dann klicken.
+  await page.getByRole("button", { name: "Konto-Menue" }).click();
   await page.getByRole("button", { name: "Abmelden" }).click();
   await expect(page).toHaveURL("/anmelden");
 
@@ -39,5 +42,5 @@ test("Registrieren -> Rolle waehlen -> Dashboard -> Logout -> erneut anmelden oh
   // Onboarding wird NICHT erneut angezeigt -- die Login-Action leitet direkt ins passende
   // Dashboard weiter, weil das Profil bereits eine Rolle hat.
   await expect(page).toHaveURL("/dashboard/freelancer");
-  await expect(page.getByText("Rolle: Freelancer")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Meine Projekte" })).toBeVisible();
 });

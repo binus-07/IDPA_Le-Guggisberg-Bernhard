@@ -15,12 +15,12 @@ export function RegistrierenForm() {
 
   if (state.emailBestaetigungNoetig) {
     return (
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
         <CardHeader>
-          <CardTitle className="font-heading text-2xl">Fast geschafft</CardTitle>
-          <CardDescription>
-            Wir haben dir eine E-Mail geschickt. Bitte bestätige deine Adresse über den Link
-            darin, um die Registrierung abzuschliessen.
+          <CardTitle className="text-h2 text-foreground">Fast geschafft</CardTitle>
+          <CardDescription className="text-body-light">
+            Wir haben dir eine E-Mail geschickt. Bitte bestätige deine Adresse über den Link darin,
+            um die Registrierung abzuschliessen.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -28,10 +28,12 @@ export function RegistrierenForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
       <CardHeader>
-        <CardTitle className="font-heading text-2xl">Registrieren</CardTitle>
-        <CardDescription>Erstelle ein Konto für die Marketing-Freelancer-Plattform.</CardDescription>
+        <CardTitle className="text-h2 text-foreground">Registrieren</CardTitle>
+        <CardDescription className="text-body-light">
+          Erstelle ein Konto für die Marketing-Freelancer-Plattform.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-4">
@@ -59,7 +61,7 @@ export function RegistrierenForm() {
             {pending ? "Registrieren …" : "Registrieren"}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="text-body-light mt-4 text-muted-foreground">
           Schon ein Konto?{" "}
           <Link href="/anmelden" className="underline underline-offset-4">
             Anmelden

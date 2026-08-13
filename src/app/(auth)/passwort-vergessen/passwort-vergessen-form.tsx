@@ -15,12 +15,12 @@ export function PasswortVergessenForm() {
 
   if (state.gesendet) {
     return (
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
         <CardHeader>
-          <CardTitle className="font-heading text-2xl">E-Mail unterwegs</CardTitle>
-          <CardDescription>
-            Falls ein Konto mit dieser Adresse existiert, haben wir einen Link zum Zurücksetzen
-            des Passworts geschickt.
+          <CardTitle className="text-h2 text-foreground">E-Mail unterwegs</CardTitle>
+          <CardDescription className="text-body-light">
+            Falls ein Konto mit dieser Adresse existiert, haben wir einen Link zum Zurücksetzen des
+            Passworts geschickt.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -28,10 +28,12 @@ export function PasswortVergessenForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
       <CardHeader>
-        <CardTitle className="font-heading text-2xl">Passwort vergessen</CardTitle>
-        <CardDescription>Wir schicken dir einen Link zum Zurücksetzen.</CardDescription>
+        <CardTitle className="text-h2 text-foreground">Passwort vergessen</CardTitle>
+        <CardDescription className="text-body-light">
+          Wir schicken dir einen Link zum Zurücksetzen.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-4">
@@ -48,7 +50,7 @@ export function PasswortVergessenForm() {
             {pending ? "Senden …" : "Link senden"}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="text-body-light mt-4 text-muted-foreground">
           <Link href="/anmelden" className="underline underline-offset-4">
             Zurück zur Anmeldung
           </Link>

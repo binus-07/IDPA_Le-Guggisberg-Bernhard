@@ -12,28 +12,64 @@ describe("OnboardingForm", () => {
     vi.mocked(onboarding).mockReset();
   });
 
-  it("rendert den Anzeigenamen sowie genau zwei Rollen-Karten", () => {
+  it("zeigt Schritt 0 mit zwei Rollen-Karten, Weiter bleibt deaktiviert bis eine gewaehlt ist", () => {
     render(<OnboardingForm />);
 
-    const anzeigename = screen.getByLabelText("Anzeigename");
-    expect(anzeigename).toBeRequired();
-    expect(anzeigename).toHaveAttribute("maxLength", "80");
+    const unternehmen = screen.getByRole("button", { name: /^business Unternehmen/ });
+    const freelancer = screen.getByRole("button", { name: /^person Freelancer/ });
+    expect(unternehmen).toBeInTheDocument();
+    expect(freelancer).toBeInTheDocument();
 
-    const unternehmen = screen.getByRole("button", { name: /^unternehmen/i });
-    const freelancer = screen.getByRole("button", { name: /^freelancer/i });
-    expect(unternehmen).toHaveAttribute("name", "rolle");
-    expect(unternehmen).toHaveAttribute("value", "unternehmen");
-    expect(freelancer).toHaveAttribute("name", "rolle");
-    expect(freelancer).toHaveAttribute("value", "freelancer");
+    const weiter = screen.getByRole("button", { name: "Weiter" });
+    expect(weiter).toBeDisabled();
+
+    fireEvent.click(freelancer);
+    expect(weiter).toBeEnabled();
   });
 
-  it("zeigt eine Fehlermeldung, wenn die Server Action einen Fehler zurückgibt", async () => {
-    vi.mocked(onboarding).mockResolvedValue({ error: "Bitte eine Rolle wählen" });
+  it("fuehrt nach Rollenwahl zum Anzeigename-Feld in Schritt 1", () => {
     render(<OnboardingForm />);
 
-    fireEvent.change(screen.getByLabelText("Anzeigename"), { target: { value: "Linus" } });
-    fireEvent.click(screen.getByRole("button", { name: /^freelancer/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^business Unternehmen/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Bitte eine Rolle wählen");
+    const anzeigename = screen.getByPlaceholderText("Dein Name auf der Plattform");
+    expect(anzeigename).toHaveAttribute("maxLength", "80");
+    // Firmenname ist nur fuer die Rolle "unternehmen" sichtbar.
+    expect(screen.getByPlaceholderText("Name deines Unternehmens")).toBeInTheDocument();
+  });
+
+  it("zeigt eine Fehlermeldung, wenn die Server Action beim letzten Schritt einen Fehler zurückgibt", async () => {
+    vi.mocked(onboarding).mockResolvedValue({ error: "Speichern hat nicht geklappt." });
+    render(<OnboardingForm />);
+
+    // Kompletter Unternehmen-Ablauf (kuerzerer der beiden Zweige: 6 statt 7 Schritte) bis zum
+    // Schritt, der die Server Action ausloest.
+    fireEvent.click(screen.getByRole("button", { name: /^business Unternehmen/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    fireEvent.change(screen.getByPlaceholderText("Dein Name auf der Plattform"), {
+      target: { value: "Linus" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /Tech & Software/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /1–10 Mitarbeitende/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /Fotografie/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /^Sofort/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+    // Die Fehlermeldung ist im Markup ein normales div ohne role="alert" -- kein
+    // Accessible-Name-Bezug moeglich, deshalb ueber den Text statt ueber die Rolle geprueft.
+    expect(await screen.findByText("Speichern hat nicht geklappt.")).toBeInTheDocument();
+    expect(onboarding).toHaveBeenCalledWith(
+      expect.objectContaining({ rolle: "unternehmen", anzeigename: "Linus" }),
+    );
   });
 });

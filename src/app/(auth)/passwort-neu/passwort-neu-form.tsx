@@ -13,10 +13,12 @@ export function PasswortNeuForm() {
   const [state, formAction, pending] = useActionState(passwortNeuSetzen, initialState);
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-[480px] [--card-spacing:--spacing(12)]">
       <CardHeader>
-        <CardTitle className="font-heading text-2xl">Neues Passwort</CardTitle>
-        <CardDescription>Wähle ein neues Passwort für dein Konto.</CardDescription>
+        <CardTitle className="text-h2 text-foreground">Neues Passwort</CardTitle>
+        <CardDescription className="text-body-light">
+          Wähle ein neues Passwort für dein Konto.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-4">
