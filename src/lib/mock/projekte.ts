@@ -10,19 +10,19 @@ const PROJEKTE: Projekt[] = [
     id: "brack-alltron",
     titel: "Brack.alltron Mitarbeiter Plattform erstellen",
     auftragsbeschreibung:
-      "Auftrag: Eine Webseite für die Brack.Alltron Mitarbeiter wo interne Nachrichten wie auch ein digitales Telefonbuch geführt wird für welches neue Fotos von den Mitarbeiter braucht.",
+      "Auftrag: Eine Webseite für die Mitarbeitenden von Brack.alltron, auf der interne Nachrichten sowie ein digitales Telefonbuch geführt werden. Dafür werden neue Fotos der Mitarbeitenden benötigt.",
     teilaufgaben: [
       {
         titel: "Webseite erstellen",
         fortschrittProzent: 41,
         freelancerName: "Lukas",
-        freelancerRolle: "Webprogramierer",
+        freelancerRolle: "Webprogrammierer",
         betragChf: 4000,
         frist: "24. November 2026",
         letzteNachricht: "Ich habe jetzt die Domain lizensiert, hier ist die Rechnung",
       },
       {
-        titel: "Mitarbeiter fotografiern",
+        titel: "Mitarbeiter fotografieren",
         fortschrittProzent: 87,
         freelancerName: "Hannes",
         freelancerRolle: "Fotograf",
@@ -38,7 +38,7 @@ const PROJEKTE: Projekt[] = [
         betragChf: 1800,
         frist: "20. August 2026",
         letzteNachricht:
-          "Schön das Ihnen das Mockup so gefällt, ich leite es weiter an Lukas für die Umsetzung",
+          "Schön, dass Ihnen das Mockup so gefällt, ich leite es weiter an Lukas für die Umsetzung",
       },
     ],
   },

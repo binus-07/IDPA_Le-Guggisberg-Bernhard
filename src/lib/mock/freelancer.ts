@@ -20,7 +20,7 @@ const FREELANCER: Freelancer[] = [
   {
     id: "lena",
     name: "Lena",
-    rolle: "Fotograf",
+    rolle: "Fotografin",
     seitJahren: 8,
     beschreibung:
       "Ich bin Lena aus Zürich und spezialisiere mich auf Produkt- und E-Commerce-Fotografie. Meine Kunden schätzen saubere Bildwelten, schnelle Lieferung und einen unkomplizierten",
@@ -38,7 +38,7 @@ const FREELANCER: Freelancer[] = [
   {
     id: "selin",
     name: "Selin",
-    rolle: "Fotograf",
+    rolle: "Fotografin",
     seitJahren: 5,
     beschreibung:
       "Ich bin Selin aus Bern und mein Fokus liegt auf People-Fotografie. Portraits, Team-Shootings und echte Emotionen. Menschen so zu zeigen wie sie wirklich sind, das ist mein",
@@ -56,7 +56,7 @@ const FREELANCER: Freelancer[] = [
   {
     id: "nina",
     name: "Nina",
-    rolle: "Fotograf",
+    rolle: "Fotografin",
     seitJahren: 3,
     beschreibung:
       "Ausgebildet an der Schule für Gestaltung St. Gallen, spezialisiert auf Social-Media-Content und Lifestyle-Fotografie. Ich denke von Anfang an in Formaten und liefere direkt",

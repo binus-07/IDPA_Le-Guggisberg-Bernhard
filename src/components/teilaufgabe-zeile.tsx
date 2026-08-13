@@ -36,7 +36,7 @@ export function TeilaufgabeZeile({ teilaufgabe }: { teilaufgabe: Teilaufgabe }) 
           Bis {teilaufgabe.frist}
         </p>
         <p className="text-body text-foreground">
-          Letzte Nachricht: &ldquo;{teilaufgabe.letzteNachricht}&rdquo;
+          Letzte Nachricht: &bdquo;{teilaufgabe.letzteNachricht}&ldquo;
         </p>
       </div>
     </div>

@@ -14,7 +14,7 @@ describe("ProjektDetailInhalt", () => {
     expect(screen.getByRole("heading", { name: "Teilaufgaben" })).toBeInTheDocument();
 
     expect(screen.getByText("Webseite erstellen")).toBeInTheDocument();
-    expect(screen.getByText("Mitarbeiter fotografiern")).toBeInTheDocument();
+    expect(screen.getByText("Mitarbeiter fotografieren")).toBeInTheDocument();
     expect(screen.getByText("Mockup designen")).toBeInTheDocument();
 
     expect(screen.getByText(/CHF 4’000/)).toBeInTheDocument();
