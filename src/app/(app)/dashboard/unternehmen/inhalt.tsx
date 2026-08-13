@@ -22,10 +22,10 @@ export function UnternehmenDashboardInhalt({
           <span className="block">Ihr Marketing</span>
           <span className="block">Effizient gestalten</span>
         </h1>
-        <p className="text-lead max-w-xl text-foreground">In wenigen Schritten zur Lösung</p>
+        <p className="text-lead max-w-xl text-muted-foreground">In wenigen Schritten zur Lösung</p>
       </section>
 
-      <section className="flex flex-col gap-8 lg:flex-row lg:items-stretch">
+      <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <PromoKachel
           titel="Produkt Promoten"
           titelRolle="h3"
@@ -47,8 +47,8 @@ export function UnternehmenDashboardInhalt({
       </section>
 
       <section className="flex flex-col gap-8">
-        <h2 className="text-section-label text-foreground">Freelancer-Kategorien</h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        <h2 className="text-h2 text-foreground">Freelancer-Kategorien</h2>
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
           {kategorien.map((kategorie) => (
             <BildKarte key={kategorie.id} label={kategorie.name} bildAlt="" />
           ))}
@@ -56,8 +56,8 @@ export function UnternehmenDashboardInhalt({
       </section>
 
       <section className="flex flex-col gap-8">
-        <h2 className="text-section-label text-foreground">Top Freelancer</h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-[100px]">
+        <h2 className="text-h2 text-foreground">Top Freelancer</h2>
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-5">
           {topFreelancer.map((freelancer) => (
             <FreelancerKarteKompakt key={freelancer.id} freelancer={freelancer} />
           ))}

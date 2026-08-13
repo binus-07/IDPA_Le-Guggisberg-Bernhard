@@ -34,90 +34,94 @@ export function AppShell({ rolle, children }: { rolle: Rolle | null; children: R
   const items = navItems(rolle);
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col">
-      <header className="relative z-10 mx-auto flex w-full max-w-[1680px] items-center justify-between px-6 py-6 md:px-10 lg:px-16 xl:px-[131px] xl:py-[42px]">
-        <nav aria-label="Hauptnavigation" className="flex items-center">
-          <button
-            type="button"
-            className={cn("text-foreground md:hidden", FOKUS_RING)}
-            aria-expanded={menuOffen}
-            aria-label={menuOffen ? "Menue schliessen" : "Menue oeffnen"}
-            onClick={() => setMenuOffen((offen) => !offen)}
-          >
-            {menuOffen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-          </button>
-          <ul
-            className={cn(
-              "flex-col gap-6 md:flex md:flex-row md:items-center md:gap-8 xl:gap-12",
-              menuOffen
-                ? "absolute top-full left-0 flex w-full flex-col gap-6 bg-card px-6 py-6"
-                : "hidden",
-            )}
-          >
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMenuOffen(false)}
-                  className={cn(
-                    "text-body text-foreground",
-                    istAktiv(pathname, item.href) ? "font-black" : "font-normal",
-                    FOKUS_RING,
-                  )}
+    <div className="relative flex min-h-full flex-1 flex-col overflow-x-hidden">
+      <Kugel />
+      <header className="fixed top-0 left-0 right-0 z-50 h-[80px] border-b border-border bg-card">
+        <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 md:px-10">
+          <span className="font-heading text-[24px] font-normal text-foreground select-none">
+            FREELANCE.CH
+          </span>
+
+          <nav aria-label="Hauptnavigation">
+            <button
+              type="button"
+              className={cn("text-foreground md:hidden", FOKUS_RING)}
+              aria-expanded={menuOffen}
+              aria-label={menuOffen ? "Menue schliessen" : "Menue oeffnen"}
+              onClick={() => setMenuOffen((offen) => !offen)}
+            >
+              {menuOffen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+            </button>
+            <ul
+              className={cn(
+                "flex-col gap-6 md:flex md:flex-row md:items-center md:gap-8",
+                menuOffen
+                  ? "absolute top-full left-0 flex w-full flex-col gap-6 border-b border-border bg-card px-6 py-6"
+                  : "hidden",
+              )}
+            >
+              {items.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setMenuOffen(false)}
+                    className={cn(
+                      "text-body font-bold transition-colors duration-200",
+                      istAktiv(pathname, item.href)
+                        ? "border-b-2 border-primary pb-1 text-primary"
+                        : "text-foreground hover:text-primary",
+                      FOKUS_RING,
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <span
+                  aria-disabled="true"
+                  className="text-body cursor-not-allowed font-bold text-foreground/50"
                 >
-                  {item.label}
-                </Link>
+                  {CHATS_LABEL}
+                </span>
               </li>
-            ))}
-            <li>
-              <span
-                aria-disabled="true"
-                className="text-body cursor-not-allowed font-normal text-foreground/50"
-              >
-                {CHATS_LABEL}
-              </span>
-            </li>
-          </ul>
-        </nav>
-        <div className="relative">
-          {/*
-            Bewusst kein role="menu"/"menuitem": das ARIA-Menu-Pattern verlangt
-            Pfeiltasten-Navigation zwischen den Eintraegen, die dieses simple
-            Ein-Aktion-Popover nicht implementiert -- die impliziten button-Rollen sind hier
-            korrekter als ein unvollstaendiges ARIA-Widget.
-          */}
-          <button
-            type="button"
-            aria-haspopup="true"
-            aria-expanded={kontoMenuOffen}
-            aria-label="Konto-Menue"
-            onClick={() => setKontoMenuOffen((offen) => !offen)}
-            className={cn(
-              "flex size-[61px] shrink-0 items-center justify-center rounded-full border-2 border-foreground text-foreground",
-              FOKUS_RING,
-            )}
-          >
-            <User aria-hidden="true" />
-          </button>
-          {kontoMenuOffen ? (
-            <div className="absolute top-[calc(100%+8px)] right-0 min-w-40 rounded-lg bg-card p-2 shadow-none">
-              <form action={signOut}>
-                <button
-                  type="submit"
-                  className={cn(
-                    "text-body w-full rounded-sm px-3 py-2 text-left text-foreground hover:bg-muted/50",
-                    FOKUS_RING,
-                  )}
-                >
-                  Abmelden
-                </button>
-              </form>
-            </div>
-          ) : null}
+            </ul>
+          </nav>
+
+          <div className="relative">
+            <button
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={kontoMenuOffen}
+              aria-label="Konto-Menue"
+              onClick={() => setKontoMenuOffen((offen) => !offen)}
+              className={cn(
+                "flex size-[40px] shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:border-primary transition-colors duration-200",
+                FOKUS_RING,
+              )}
+            >
+              <User aria-hidden="true" size={18} />
+            </button>
+            {kontoMenuOffen ? (
+              <div className="absolute top-[calc(100%+8px)] right-0 min-w-40 rounded-lg bg-card p-2 shadow-none border border-border">
+                <form action={signOut}>
+                  <button
+                    type="submit"
+                    className={cn(
+                      "text-body w-full rounded-sm px-3 py-2 text-left text-foreground hover:bg-muted/50",
+                      FOKUS_RING,
+                    )}
+                  >
+                    Abmelden
+                  </button>
+                </form>
+              </div>
+            ) : null}
+          </div>
         </div>
-        <Kugel />
       </header>
-      <main className="relative z-[1] flex flex-1 flex-col">{children}</main>
+
+      <main className="relative z-[1] flex flex-1 flex-col pt-[80px]">{children}</main>
     </div>
   );
 }
