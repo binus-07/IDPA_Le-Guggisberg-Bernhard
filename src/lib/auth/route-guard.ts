@@ -10,8 +10,23 @@ const ONBOARDING_PATH = "/onboarding";
 const DASHBOARD_PREFIX = "/dashboard/";
 const AUTH_PAGES = ["/anmelden", "/registrieren"];
 
+// Die vier neuen Mockup-Screens (Marketing-Planung, Freelancer-Detail, Projekte-Uebersicht und
+// -Detail) sind Teil der eingeloggten Anwendung und werden deshalb wie /dashboard/* geschuetzt,
+// obwohl sie keine eigenen dashboardRolleFor()-Eintraege brauchen (keine rollenspezifische
+// Zielseite, nur "eingeloggt + Onboarding abgeschlossen" wie /onboarding selbst).
+const APP_EXACT_PATHS = ["/marketing-planung", "/projekte"];
+const APP_PREFIXES = ["/freelancer/", "/projekte/"];
+
+function isAppPath(pathname: string): boolean {
+  return (
+    APP_EXACT_PATHS.includes(pathname) || APP_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
+}
+
 function isProtectedPath(pathname: string): boolean {
-  return pathname === ONBOARDING_PATH || pathname.startsWith(DASHBOARD_PREFIX);
+  return (
+    pathname === ONBOARDING_PATH || pathname.startsWith(DASHBOARD_PREFIX) || isAppPath(pathname)
+  );
 }
 
 function dashboardRolleFor(pathname: string): Rolle | null {
@@ -53,6 +68,10 @@ export function determineRedirect({ pathname, hasSession, rolle }: RouteGuardInp
     if (requiredRolle && requiredRolle !== rolle) {
       return `/dashboard/${rolle}`;
     }
+  }
+
+  if (isAppPath(pathname) && !rolle) {
+    return ONBOARDING_PATH;
   }
 
   return null;
