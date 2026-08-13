@@ -80,6 +80,11 @@
   --chart-4: oklch(1 0 0 / 40%);
   --chart-5: oklch(1 0 0 / 20%);
   --radius: 0.5rem; /* 8px -- Karten, Panels, Listeneintraege */
+  /* Gestufte Schriftskalierung (Abschnitt 10 der Vorgabe): Basiswerte in den
+     Typografie-Klassen unten gelten bei 1920px (Skalierungsfaktor 1). Mobile-first
+     kaskadiert: 0.5 als Basis, 0.6 ab 768px, 0.75 ab 1280px, 1 ab 1920px. Nur zwei
+     Rollen (Display, Seitentitel) nutzen zusaetzlich echtes clamp() statt der Stufe. */
+  --fz-scale: 0.5;
   --sidebar: oklch(0.2881 0.0219 262.5);
   --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.6086 0.1505 37.1);
@@ -98,6 +103,24 @@
   }
 }
 
+@media (min-width: 768px) {
+  :root {
+    --fz-scale: 0.6;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --fz-scale: 0.75;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --fz-scale: 1;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -107,5 +130,103 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* Typografie-Rollen aus Abschnitt 1 der Vorgabe (Basiswerte bei 1920px). Anton wird bewusst
+   nicht durchgaengig fuer Ueberschriften verwendet -- text-h2 (Anton) und text-h2-alt (Inter
+   Bold) sind zwei verschiedene Rollen fuer denselben visuellen Rang, siehe ADR 006. */
+@layer components {
+  .text-display {
+    font-family: var(--font-anton);
+    font-weight: 400;
+    line-height: 1.05;
+    font-size: clamp(2.34375rem, 1.746rem + 2.451vw, 4.6875rem); /* 37.5px -> 75px */
+  }
+  .text-page-title {
+    font-family: var(--font-inter);
+    font-weight: 900;
+    line-height: 1.1;
+    font-size: clamp(1.5625rem, 1.164rem + 1.634vw, 3.125rem); /* 25px -> 50px */
+  }
+  .text-h2 {
+    font-family: var(--font-anton);
+    font-weight: 400;
+    line-height: 1.15;
+    font-size: calc(2.5rem * var(--fz-scale)); /* 40px */
+  }
+  .text-h2-alt {
+    font-family: var(--font-inter);
+    font-weight: 700;
+    line-height: 1.2;
+    font-size: calc(2.5rem * var(--fz-scale)); /* 40px */
+  }
+  .text-h3 {
+    font-family: var(--font-anton);
+    font-weight: 400;
+    line-height: 1.2;
+    font-size: calc(1.875rem * var(--fz-scale)); /* 30px */
+  }
+  .text-section-label {
+    font-family: var(--font-inter);
+    font-weight: 400;
+    line-height: 1.2;
+    font-size: calc(2.5rem * var(--fz-scale)); /* 40px */
+  }
+  .text-name-lg {
+    font-family: var(--font-inter);
+    font-weight: 700;
+    line-height: 1.2;
+    font-size: calc(2.1875rem * var(--fz-scale)); /* 35px */
+  }
+  .text-name {
+    font-family: var(--font-inter);
+    font-weight: 400;
+    line-height: 1.2;
+    font-size: calc(2.1875rem * var(--fz-scale)); /* 35px */
+  }
+  .text-row-title {
+    font-family: var(--font-inter);
+    font-weight: 400;
+    line-height: 1.25;
+    font-size: calc(1.875rem * var(--fz-scale)); /* 30px */
+  }
+  .text-lead {
+    font-family: var(--font-inter);
+    font-weight: 300;
+    line-height: 1.3;
+    font-size: calc(2.125rem * var(--fz-scale)); /* 34px */
+  }
+  .text-body-lg {
+    font-family: var(--font-inter);
+    font-weight: 300;
+    line-height: 1.35;
+    font-size: calc(1.625rem * var(--fz-scale)); /* 26px */
+  }
+  .text-body {
+    font-family: var(--font-inter);
+    font-weight: 400;
+    line-height: 1.4;
+    font-size: calc(1.25rem * var(--fz-scale)); /* 20px */
+  }
+  .text-body-light {
+    font-family: var(--font-inter);
+    font-weight: 300;
+    line-height: 1.4;
+    font-size: calc(1.25rem * var(--fz-scale)); /* 20px */
+  }
+  .text-small {
+    font-family: var(--font-inter);
+    font-weight: 300;
+    line-height: 1.3;
+    font-size: calc(1.125rem * var(--fz-scale)); /* 18px */
+  }
+  /* Feste Groesse (kein --fz-scale): die Buttonschrift muss laut Abschnitt 11 verbindlich bei
+     mindestens 18px/Bold bleiben, damit Weiss-auf-Akzent als Grosstext (Schwelle 3:1) gilt. */
+  .text-button {
+    font-family: var(--font-inter);
+    font-weight: 700;
+    line-height: 1;
+    font-size: 1.125rem; /* 18px */
   }
 }
