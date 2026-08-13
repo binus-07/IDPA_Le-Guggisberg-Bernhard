@@ -28,5 +28,6 @@ test("Dashboard Unternehmen -> Marketing Planung -> Freelancer-Detail", async ({
   await page.getByRole("link", { name: /Hannes/ }).click();
 
   await expect(page).toHaveURL("/freelancer/hannes");
-  await expect(page.getByText("Hannes")).toBeVisible();
+  // exact: true, sonst matcht auch der Next.js-Route-Announcer ("Hannes – Freelancer").
+  await expect(page.getByText("Hannes", { exact: true })).toBeVisible();
 });
