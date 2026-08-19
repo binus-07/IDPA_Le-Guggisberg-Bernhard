@@ -5,7 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const { rolle } = await fetchSessionAndRolle(supabase);
+  const { user, rolle } = await fetchSessionAndRolle(supabase);
 
-  return <AppShell rolle={rolle}>{children}</AppShell>;
+  return (
+    <AppShell rolle={rolle} user={user}>
+      {children}
+    </AppShell>
+  );
 }

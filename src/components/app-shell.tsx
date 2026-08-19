@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { Menu, User, X } from "lucide-react";
+import { Menu, User as UserIcon, X } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth/actions";
 import type { Rolle } from "@/lib/auth/route-guard";
 import { Kugel } from "@/components/kugel";
+import { LogoutDialog } from "@/components/logout-dialog";
 
 const CHATS_LABEL = "Chats";
 
@@ -27,10 +28,19 @@ function istAktiv(pathname: string, href: string): boolean {
 const FOKUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm";
 
-export function AppShell({ rolle, children }: { rolle: Rolle | null; children: ReactNode }) {
+export function AppShell({
+  rolle,
+  user,
+  children,
+}: {
+  rolle: Rolle | null;
+  user?: User | null;
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const [menuOffen, setMenuOffen] = useState(false);
   const [kontoMenuOffen, setKontoMenuOffen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const items = navItems(rolle);
 
   return (
@@ -97,27 +107,40 @@ export function AppShell({ rolle, children }: { rolle: Rolle | null; children: R
               FOKUS_RING,
             )}
           >
-            <User aria-hidden="true" />
+            <UserIcon aria-hidden="true" />
           </button>
           {kontoMenuOffen ? (
-            <div className="absolute top-[calc(100%+8px)] right-0 min-w-40 rounded-lg bg-card p-2 shadow-none">
-              <form action={signOut}>
-                <button
-                  type="submit"
-                  className={cn(
-                    "text-body w-full rounded-sm px-3 py-2 text-left text-foreground hover:bg-muted/50",
-                    FOKUS_RING,
-                  )}
-                >
-                  Abmelden
-                </button>
-              </form>
+            <div className="absolute top-[calc(100%+8px)] right-0 min-w-56 rounded-lg border border-border bg-card p-0 shadow-none overflow-hidden">
+              {user ? (
+                <div className="border-b border-border bg-muted/30 px-4 py-3">
+                  <p className="text-sm font-medium text-foreground">{user.email}</p>
+                  {user.user_metadata?.username ? (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      @{user.user_metadata.username}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => {
+                  setLogoutDialogOpen(true);
+                  setKontoMenuOffen(false);
+                }}
+                className={cn(
+                  "text-body w-full rounded-none px-4 py-3 text-left text-foreground hover:bg-muted/50 transition-colors",
+                  FOKUS_RING,
+                )}
+              >
+                Abmelden
+              </button>
             </div>
           ) : null}
         </div>
         <Kugel />
       </header>
       <main className="relative z-[1] flex flex-1 flex-col">{children}</main>
+      <LogoutDialog isOpen={logoutDialogOpen} onClose={() => setLogoutDialogOpen(false)} />
     </div>
   );
 }
