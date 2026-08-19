@@ -1,6 +1,7 @@
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { Seitentitel } from "@/components/seitentitel";
 import { Sternebewertung } from "@/components/sternebewertung";
+import { FreelancerSkills } from "@/components/freelancer-skills";
 import type { Freelancer } from "@/lib/types/freelancer";
 
 export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer }) {
@@ -35,6 +36,8 @@ export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer 
             )}
           </div>
         </div>
+
+        <FreelancerSkills freelancer={freelancer} />
 
         <div className="flex flex-col gap-8">
           <h2 className="text-h2-alt text-foreground">Bisherige Projekte</h2>
