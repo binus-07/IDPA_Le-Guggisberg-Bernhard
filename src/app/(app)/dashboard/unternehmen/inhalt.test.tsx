@@ -2,14 +2,22 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { getFreelancer } from "@/lib/mock/freelancer";
 import { getKategorien } from "@/lib/mock/kategorien";
+import { getProjekte } from "@/lib/mock/projekte";
 import { UnternehmenDashboardInhalt } from "./inhalt";
 
 describe("UnternehmenDashboardInhalt", () => {
   it("zeigt Hero, Promo-Kacheln, Kategorien und Top Freelancer", () => {
     const kategorien = getKategorien();
     const topFreelancer = [getFreelancer("hannes")!, getFreelancer("anna")!];
+    const projekte = getProjekte();
 
-    render(<UnternehmenDashboardInhalt kategorien={kategorien} topFreelancer={topFreelancer} />);
+    render(
+      <UnternehmenDashboardInhalt
+        kategorien={kategorien}
+        topFreelancer={topFreelancer}
+        projekte={projekte}
+      />,
+    );
 
     expect(
       screen.getByRole("heading", { name: /Ihr Marketing.*Effizient gestalten/ }),

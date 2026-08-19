@@ -1,8 +1,10 @@
 import { BildKarte } from "@/components/bild-karte";
 import { FreelancerKarteKompakt } from "@/components/freelancer-karte-kompakt";
 import { PromoKachel } from "@/components/promo-kachel";
+import { UnternehmenDashboardStats } from "@/components/unternehmen-dashboard-stats";
 import type { Freelancer } from "@/lib/types/freelancer";
 import type { Kategorie } from "@/lib/types/kategorie";
+import type { Projekt } from "@/lib/types/projekt";
 
 /**
  * Vom Server-Guard in page.tsx getrennt, damit sich der eigentliche Seiteninhalt ohne
@@ -11,9 +13,11 @@ import type { Kategorie } from "@/lib/types/kategorie";
 export function UnternehmenDashboardInhalt({
   kategorien,
   topFreelancer,
+  projekte,
 }: {
   kategorien: Kategorie[];
   topFreelancer: Freelancer[];
+  projekte: Projekt[];
 }) {
   return (
     <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-24 px-6 pt-8 pb-24 md:px-10 lg:px-16 lg:pt-16 xl:px-[131px]">
@@ -24,6 +28,8 @@ export function UnternehmenDashboardInhalt({
         </h1>
         <p className="text-lead max-w-xl text-foreground">In wenigen Schritten zur Lösung</p>
       </section>
+
+      <UnternehmenDashboardStats projekte={projekte} topFreelancer={topFreelancer} />
 
       <section className="flex flex-col gap-8 lg:flex-row lg:items-stretch">
         <PromoKachel
