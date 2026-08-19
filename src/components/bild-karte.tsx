@@ -3,20 +3,7 @@ import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { cn } from "@/lib/utils";
 
 const FOKUS =
-  "focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
-
-/**
- * Generische Bild-oben/Beschriftung-unten-Karte (Kategorien auf Screen 1, spaeter "Meine
- * Projekte" im Freelancer-Dashboard -- selbes Raster, andere Inhalte/Linkziele). Lange
- * Beschriftungen bekommen automatisch eine kleinere Schrift statt eines Sonderfalls pro Name
- * (>17 Zeichen -> 25px, >13 Zeichen -> 28px, sonst 30px -- trifft mit den 6 Kategorienamen exakt
- * die im Mockup gemessenen Werte).
- */
-function labelGroesse(label: string): string {
-  if (label.length > 17) return "text-[25px]";
-  if (label.length > 13) return "text-[28px]";
-  return "text-[30px]";
-}
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring focus-visible:rounded-xl";
 
 export function BildKarte({
   label,
@@ -27,13 +14,15 @@ export function BildKarte({
   href?: string;
   bildAlt: string;
 }) {
-  // min-w-0 ist noetig, weil dies direkte Grid-Kinder sind: ohne die Klasse verhindert Grids
-  // implizites min-width:auto den Umbruch langer Woerter (z. B. "Webprogrammierung") -- der Text
-  // ueberlaeuft dann in die Nachbarspalte statt zweizeilig zu brechen.
   const inhalt = (
-    <div className="flex h-full min-w-0 flex-col gap-3">
-      <PlatzhalterBild alt={bildAlt} radius="image" className="aspect-[252/354] w-full" />
-      <p className={cn("font-sans font-normal text-foreground text-center", labelGroesse(label))}>
+    <div className={cn("card-hover relative h-48 min-w-0 overflow-hidden rounded-xl border border-border group", href && "cursor-pointer")}>
+      <PlatzhalterBild
+        alt={bildAlt}
+        radius="card"
+        className="absolute inset-0 h-full w-full opacity-60 transition-transform duration-500 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+      <p className="absolute bottom-4 left-4 font-heading font-normal text-white" style={{ fontSize: "24px", lineHeight: "1.2" }}>
         {label}
       </p>
     </div>
@@ -41,7 +30,7 @@ export function BildKarte({
 
   if (href) {
     return (
-      <Link href={href} className={cn("block h-full min-w-0", FOKUS)}>
+      <Link href={href} className={cn("block min-w-0", FOKUS)}>
         {inhalt}
       </Link>
     );

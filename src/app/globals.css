@@ -71,7 +71,7 @@
   --accent-foreground: oklch(1 0 0);
   /* Kein Mockup-Wert vorhanden -- shadcn-Dark-Default uebernommen, siehe ADR 006. */
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 8%);
+  --border: #2D3139;
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.6086 0.1505 37.1 / 50%);
   --chart-1: oklch(0.7146 0.0106 253.5);
@@ -137,6 +137,12 @@
    nicht durchgaengig fuer Ueberschriften verwendet -- text-h2 (Anton) und text-h2-alt (Inter
    Bold) sind zwei verschiedene Rollen fuer denselben visuellen Rang, siehe ADR 006. */
 @layer components {
+  .card-hover {
+    transition: border-color 0.2s ease-in-out;
+  }
+  .card-hover:hover {
+    border-color: var(--primary);
+  }
   .text-display {
     font-family: var(--font-anton);
     font-weight: 400;
