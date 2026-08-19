@@ -23,7 +23,7 @@ describe("FreelancerDashboardInhalt", () => {
   it("zeigt leere Zustaende ohne Anfragen und Projekte", () => {
     render(<FreelancerDashboardInhalt offeneAnfragen={[]} projekte={[]} />);
 
-    expect(screen.getByText("Aktuell keine offenen Anfragen.")).toBeInTheDocument();
-    expect(screen.getByText("Noch keine Projekte.")).toBeInTheDocument();
+    expect(screen.getByText("Keine offenen Anfragen")).toBeInTheDocument();
+    expect(screen.getByText("Noch keine Projekte")).toBeInTheDocument();
   });
 });
