@@ -1068,29 +1068,17 @@ export function synthesizeBeschreibung(
   b?: FragebogenBData | null
 ): string {
   if (typ === "marke" && a) {
-    return [
-      `Unternehmenstyp: ${a.unternehmenstyp}${a.unternehmenstypSonstige ? ` (${a.unternehmenstypSonstige})` : ""}`,
-      `Grösse: ${a.unternehmensgroesse}`,
-      `Markenziel: ${a.markenziel}`,
-      `Zielgruppe: ${[...a.zielgruppeSegment, ...a.zielgruppeAlter].join(", ")}`,
-      a.zielgruppeBeschreibung ? `Zielgruppenbeschreibung: ${a.zielgruppeBeschreibung}` : "",
-      `CI/CD: ${a.cicdStatus}`,
-      `Aktuelle Kanäle: ${a.kanaele.join(", ")}`,
-      `Tonalität: ${a.tonalitaet}`,
-      `Markenstärke: ${a.markenstärke}`,
-    ].filter(Boolean).join(". ");
+    const parts: string[] = [];
+    if (a.unternehmenstyp) parts.push(a.unternehmenstyp);
+    if (a.markenziel) parts.push(a.markenziel.toLowerCase());
+    if (a.zielgruppeSegment?.length) parts.push(`Zielgruppe: ${a.zielgruppeSegment.join(", ")}`);
+    return parts.join(" · ");
   }
   if (typ === "produkt" && b) {
-    return [
-      `Angebot: ${b.angebotstyp}`,
-      `Status: ${b.produktstatus}`,
-      `Marketingziel: ${b.marketingziel}`,
-      `Zielgruppe: ${[b.zielgruppeSegment, ...b.zielgruppeAlter].join(", ")}`,
-      b.zielgruppeBeschreibung ? `Käuferprofil: ${b.zielgruppeBeschreibung}` : "",
-      `USP: ${b.usp}`,
-      `Preissegment: ${b.preissegment}`,
-      `Gewünschte Leistungen: ${b.leistungen.join(", ")}`,
-    ].filter(Boolean).join(". ");
+    const parts: string[] = [];
+    if (b.angebotstyp) parts.push(b.angebotstyp);
+    if (b.marketingziel) parts.push(b.marketingziel.toLowerCase());
+    return parts.join(" · ");
   }
   return "";
 }

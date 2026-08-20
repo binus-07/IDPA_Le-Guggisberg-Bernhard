@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { erstelleProjekt } from "./actions";
 import {
   FragebogenTyp,
@@ -24,10 +25,36 @@ type WizardStep =
   | "fragebogen-typ"
   | "fragebogen"
   | "empfehlung"
+  | "aktivitaeten"
+  | "freelancer-auswahl"
   | "leistungen"
   | "budget"
   | "zeitrahmen"
   | "matching";
+
+type FreelancerKarte = {
+  id: string;
+  name: string;
+  rolle: string;
+  jahre: number | null;
+  bezahlung: number | null;
+  bewertung: number | null;
+};
+
+type AktivitaetGruppeData = {
+  aktivitaet: string;
+  rolle: string | null;
+  freelancer: FreelancerKarte[];
+};
+
+type KiCache = {
+  strategie: string | null;
+  leistungen: string[];
+  tipps: { icon: string; text: string }[];
+  freelancer: { id: string; name: string; rolle: string }[];
+  flEmpfehlung: string | null;
+  aktivitaeten: string[];
+};
 
 type WizardData = {
   name: string;
@@ -39,6 +66,10 @@ type WizardData = {
   fragebogenTyp: FragebogenTyp | null;
   fragebogenA: FragebogenAData | null;
   fragebogenB: FragebogenBData | null;
+  aktivitaeten: string[];
+  kiCache: KiCache | null;
+  flAuswahlCache: AktivitaetGruppeData[] | null;
+  selectedFreelancerIds: string[];
 };
 
 const defaultData: WizardData = {
@@ -51,12 +82,16 @@ const defaultData: WizardData = {
   fragebogenTyp: null,
   fragebogenA: null,
   fragebogenB: null,
+  aktivitaeten: [],
+  kiCache: null,
+  flAuswahlCache: null,
+  selectedFreelancerIds: [],
 };
 
 // Visual step number + total for indicator, depends on path
 function visualStep(step: WizardStep, modus: Modus | null): { current: number; total: number } {
-  const withBeratung: WizardStep[] = ["name", "modus", "fragebogen-typ", "empfehlung", "budget", "zeitrahmen"];
-  const ohnBeratung: WizardStep[] = ["name", "modus", "leistungen", "budget", "zeitrahmen"];
+  const withBeratung: WizardStep[] = ["name", "modus", "fragebogen-typ", "empfehlung", "aktivitaeten", "freelancer-auswahl"];
+  const ohnBeratung: WizardStep[] = ["name", "modus", "leistungen", "budget", "zeitrahmen", "freelancer-auswahl"];
   const sequence = modus === "beratung" ? withBeratung : ohnBeratung;
   const idx = sequence.indexOf(step);
   return { current: idx + 1, total: sequence.length };
@@ -65,7 +100,7 @@ function visualStep(step: WizardStep, modus: Modus | null): { current: number; t
 // ─── Shared atoms ──────────────────────────────────────────────────────────────
 
 function StepIndicator({ step, modus }: { step: WizardStep; modus: Modus | null }) {
-  if (step === "matching" || step === "empfehlung" || step === "fragebogen") return null;
+  if (step === "matching" || step === "empfehlung" || step === "fragebogen" || step === "freelancer-auswahl") return null;
   const { current, total } = visualStep(step, modus);
   const pct = Math.round((current / total) * 100);
   return (
@@ -361,6 +396,7 @@ function StepEmpfehlung({
   fragebogenTyp,
   fragebogenA,
   fragebogenB,
+  cache,
   onNext,
   onBack,
 }: {
@@ -368,60 +404,66 @@ function StepEmpfehlung({
   fragebogenTyp: import("./fragebogen").FragebogenTyp | null;
   fragebogenA: import("./fragebogen").FragebogenAData | null;
   fragebogenB: import("./fragebogen").FragebogenBData | null;
-  onNext: (leistungen: string[]) => void;
+  cache: KiCache | null;
+  onNext: (leistungen: string[], aktivitaeten: string[], cache: KiCache) => void;
   onBack: () => void;
 }) {
-  const [loading, setLoading] = useState(true);
-  const [strategie, setStrategie] = useState<string | null>(null);
-  const [recommended, setRecommended] = useState<string[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [tipps, setTipps] = useState<{ icon: string; text: string }[]>([]);
-  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>([]);
-  const [flEmpfehlung, setFlEmpfehlung] = useState<string | null>(null);
-  const [aktivitaeten, setAktivitaeten] = useState<string[]>([]);
+  const [loading, setLoading] = useState(cache === null);
+  const [strategie, setStrategie] = useState<string | null>(cache?.strategie ?? null);
+  const [recommended, setRecommended] = useState<string[]>(cache?.leistungen ?? []);
+  const [selected, setSelected] = useState<string[]>(cache?.leistungen ?? []);
+  const [tipps, setTipps] = useState<{ icon: string; text: string }[]>(cache?.tipps ?? []);
+  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>(cache?.freelancer ?? []);
+  const [flEmpfehlung, setFlEmpfehlung] = useState<string | null>(cache?.flEmpfehlung ?? null);
+  const [aktivitaeten, setAktivitaeten] = useState<string[]>(cache?.aktivitaeten ?? []);
 
   useEffect(() => {
+    if (cache !== null) return;
     const icons = ["description", "bar_chart", "handshake"];
-    Promise.allSettled([
-      fetch("/api/ki-analyse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
-      }).then((r) => r.json()),
-      fetch("/api/freelancer-analyse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ frage: beschreibung }),
-      }).then((r) => r.json()),
-    ]).then(async ([kiResult, flResult]) => {
-      if (kiResult.status === "fulfilled") {
-        const data = kiResult.value;
-        if (typeof data.strategie === "string" && data.strategie.trim()) setStrategie(data.strategie.trim());
-        const valid = (data.leistungen as string[] ?? []).filter((l) => ALLE_LEISTUNGEN_LABELS.includes(l));
-        const recs = valid.length > 0 ? valid : empfohleneleistungen(beschreibung);
-        setRecommended(recs);
-        setSelected(recs);
-        const rawTipps = Array.isArray(data.tipps) && data.tipps.length > 0 ? data.tipps : null;
-        setTipps(rawTipps ? rawTipps.slice(0, 3).map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text })) : TIPPS);
-      } else {
-        const recs = empfohleneleistungen(beschreibung);
-        setRecommended(recs);
-        setSelected(recs);
-        setTipps(TIPPS);
-      }
-      if (flResult.status === "fulfilled") {
-        const res = flResult.value;
-        const ids: string[] = Array.isArray(res.freelancer_ids) ? res.freelancer_ids : [];
-        if (ids.length > 0) {
-          try {
+
+    (async () => {
+      try {
+        // Step 1: ki-analyse → get recommended leistungen first
+        let leistungen: string[] = [];
+        try {
+          const kiData = await fetch("/api/ki-analyse", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
+          }).then((r) => r.json());
+          if (typeof kiData.strategie === "string" && kiData.strategie.trim()) setStrategie(kiData.strategie.trim());
+          const valid = (kiData.leistungen as string[] ?? []).filter((l) => ALLE_LEISTUNGEN_LABELS.includes(l));
+          leistungen = valid.length > 0 ? valid : empfohleneleistungen(beschreibung);
+          setRecommended(leistungen);
+          setSelected(leistungen);
+          const rawTipps = Array.isArray(kiData.tipps) && kiData.tipps.length > 0 ? kiData.tipps : null;
+          setTipps(rawTipps ? rawTipps.slice(0, 3).map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text })) : TIPPS);
+        } catch {
+          leistungen = empfohleneleistungen(beschreibung);
+          setRecommended(leistungen);
+          setSelected(leistungen);
+          setTipps(TIPPS);
+        }
+
+        // Step 2: freelancer-analyse with the concrete leistungen from ki-analyse
+        try {
+          const flData = await fetch("/api/freelancer-analyse", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ frage: beschreibung, leistungen }),
+          }).then((r) => r.json());
+          const ids: string[] = Array.isArray(flData.freelancer_ids) ? flData.freelancer_ids : [];
+          if (ids.length > 0) {
             const fl = await fetch(`/api/freelancers?ids=${ids.join(",")}`).then((r) => r.json());
             setFreelancer(Array.isArray(fl) ? fl : []);
-          } catch {}
-        }
-        if (typeof res.empfehlung === "string" && res.empfehlung.trim()) setFlEmpfehlung(res.empfehlung.trim());
-        if (Array.isArray(res.aktivitaeten)) setAktivitaeten(res.aktivitaeten);
+          }
+          if (typeof flData.empfehlung === "string" && flData.empfehlung.trim()) setFlEmpfehlung(flData.empfehlung.trim());
+          if (Array.isArray(flData.aktivitaeten)) setAktivitaeten(flData.aktivitaeten);
+        } catch {}
+      } finally {
+        setLoading(false);
       }
-    }).finally(() => setLoading(false));
+    })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (v: string) =>
@@ -514,6 +556,8 @@ function StepEmpfehlung({
                 <Link
                   key={f.id}
                   href={`/freelancer/${f.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex flex-col items-center bg-[#1A1D24] border border-[#2D3139] rounded-xl p-4 text-center hover:border-[#D95D39]/50 transition-colors"
                 >
                   <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
@@ -569,10 +613,199 @@ function StepEmpfehlung({
       </div>
 
       <NavButtons
-        onNext={() => onNext(selected)}
+        onNext={() => onNext(selected, aktivitaeten, { strategie, leistungen: selected, tipps, freelancer, flEmpfehlung, aktivitaeten })}
         onBack={onBack}
         nextDisabled={selected.length === 0}
         nextLabel="Weiter"
+      />
+    </div>
+  );
+}
+
+function StepAktivitaeten({
+  initial,
+  onNext,
+  onBack,
+}: {
+  initial: string[];
+  onNext: (aktivitaeten: string[]) => void;
+  onBack: () => void;
+}) {
+  const [selected, setSelected] = useState<string[]>(initial);
+  const toggle = (v: string) =>
+    setSelected((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
+
+  return (
+    <div className="w-full max-w-2xl flex flex-col items-center">
+      <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-6">
+        <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">auto_awesome</span>
+        <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">KI-Empfehlung</span>
+      </div>
+      <h1 className="font-heading text-5xl text-[#e2e2e9] mb-4 text-center tracking-wide">
+        Empfohlene Aktivitäten
+      </h1>
+      <p className="text-[#dfc0b7] text-base mb-10 text-center">
+        Wähle die Marketing-Aktivitäten, die zu deinem Projekt passen.
+      </p>
+      <div className="flex flex-col gap-3 w-full mb-2">
+        {initial.map((a) => {
+          const active = selected.includes(a);
+          return (
+            <button
+              key={a}
+              onClick={() => toggle(a)}
+              className={`w-full flex items-center gap-3 bg-[#1A1D24] border-2 rounded-xl px-4 py-3 text-left transition-all focus:outline-none ${
+                active ? "border-[#D95D39]" : "border-[#2D3139] hover:border-[#D95D39]/50"
+              }`}
+            >
+              <span className={`material-symbols-outlined text-base leading-none flex-shrink-0 ${active ? "text-[#D95D39]" : "text-[#4A4D55]"}`}>
+                {active ? "check_circle" : "radio_button_unchecked"}
+              </span>
+              <p className="text-[#e2e2e9] text-sm font-medium">{a}</p>
+            </button>
+          );
+        })}
+      </div>
+      <NavButtons
+        onNext={() => onNext(selected)}
+        onBack={onBack}
+        nextDisabled={selected.length === 0}
+      />
+    </div>
+  );
+}
+
+function StepFreelancerAuswahl({
+  aktivitaeten,
+  initialGruppen,
+  initialSelected,
+  onDone,
+  onBack,
+  apiPath = "/api/aktivitaet-freelancers",
+}: {
+  aktivitaeten: string[];
+  initialGruppen: AktivitaetGruppeData[] | null;
+  initialSelected: string[];
+  onDone: (gruppen: AktivitaetGruppeData[], selectedIds: string[]) => void;
+  onBack: () => void;
+  apiPath?: string;
+}) {
+  const [loading, setLoading] = useState(initialGruppen === null);
+  const [gruppen, setGruppen] = useState<AktivitaetGruppeData[]>(initialGruppen ?? []);
+  const [selected, setSelected] = useState<string[]>(initialSelected);
+
+  useEffect(() => {
+    if (initialGruppen !== null) return;
+    fetch(apiPath, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aktivitaeten }),
+    })
+      .then((r) => r.json())
+      .then((data) => setGruppen(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggleFreelancer = (id: string) =>
+    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+
+  return (
+    <div className="w-full max-w-2xl flex flex-col items-center">
+      <h1 className="font-heading text-5xl text-[#e2e2e9] mb-4 text-center tracking-wide">
+        Freelancer auswählen
+      </h1>
+      <p className="text-[#dfc0b7] text-base mb-10 text-center">
+        Wähle passende Freelancer pro Aktivität für dein Projekt.
+      </p>
+
+      {loading ? (
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-8">
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">autorenew</span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">Freelancer werden geladen...</span>
+        </div>
+      ) : (
+        <div className="w-full flex flex-col gap-10 mb-2">
+          {gruppen.map((g) => (
+            <div key={g.aktivitaet} className="w-full">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">campaign</span>
+                <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7]">{g.aktivitaet}</p>
+              </div>
+              {g.freelancer.length === 0 ? (
+                <p className="text-[#4A4D55] text-sm">Keine Freelancer gefunden.</p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {g.freelancer.map((f) => {
+                    const isSelected = selected.includes(f.id);
+                    return (
+                      <div key={f.id} className="relative">
+                        {/* Auswahl-Button: ganze Karte */}
+                        <button
+                          onClick={() => toggleFreelancer(f.id)}
+                          className={`w-full flex flex-col items-center bg-[#1A1D24] border-2 rounded-xl p-4 text-center transition-all focus:outline-none ${
+                            isSelected ? "border-[#D95D39]" : "border-[#2D3139] hover:border-[#D95D39]/50"
+                          }`}
+                        >
+                          <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
+                            <PlatzhalterBild alt={`Portrait von ${f.name}`} radius="card" className="absolute inset-0 h-full w-full" />
+                          </div>
+                          <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
+                          <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
+                          <div className="flex flex-col gap-1 w-full">
+                            {f.bewertung !== null && (
+                              <div className="flex items-center justify-center gap-1">
+                                <span className="material-symbols-outlined text-[#D95D39] text-xs leading-none">star</span>
+                                <span className="text-[#dfc0b7] text-xs">{f.bewertung.toFixed(1)}</span>
+                              </div>
+                            )}
+                            {f.jahre !== null && (
+                              <p className="text-[#4A4D55] text-xs">{f.jahre} J. Erfahrung</p>
+                            )}
+                            {f.bezahlung !== null && (
+                              <p className="text-[#4A4D55] text-xs">Ø CHF {f.bezahlung.toLocaleString("de-CH")}</p>
+                            )}
+                          </div>
+                        </button>
+                        {/* Auswahl-Checkmark */}
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#D95D39] flex items-center justify-center pointer-events-none">
+                            <span className="material-symbols-outlined text-white text-xs leading-none">check</span>
+                          </div>
+                        )}
+                        {/* Profil-Link */}
+                        <Link
+                          href={`/freelancer/${f.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-2 left-2 w-6 h-6 rounded-full bg-[#0D0F14]/80 border border-[#2D3139] flex items-center justify-center hover:border-[#D95D39] transition-colors"
+                          title="Profil ansehen"
+                        >
+                          <span className="material-symbols-outlined text-[#e2e2e9] leading-none" style={{ fontSize: "12px" }}>open_in_new</span>
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selected.length > 0 && (
+        <div className="w-full mt-4 mb-2 flex items-center gap-2 bg-[#D95D39]/10 border border-[#D95D39]/30 rounded-xl px-4 py-3">
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">group</span>
+          <p className="text-[#e2e2e9] text-sm font-semibold">{selected.length} Freelancer ausgewählt</p>
+        </div>
+      )}
+
+      <NavButtons
+        onNext={() => onDone(gruppen, selected)}
+        onBack={onBack}
+        nextLabel="Abschliessen"
+        nextDisabled={loading}
       />
     </div>
   );
@@ -840,12 +1073,6 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
 }
 
 function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => void }) {
-  const summary = [
-    { icon: "folder", label: "Projekt", value: data.name },
-    { icon: "payments", label: "Budget", value: data.budget ?? "–" },
-    { icon: "schedule", label: "Zeitrahmen", value: data.zeitrahmen ?? "–" },
-  ];
-
   return (
     <div className="w-full max-w-lg flex flex-col items-center">
       <div className="w-16 h-16 rounded-full bg-[#D95D39]/15 border border-[#D95D39]/30 flex items-center justify-center mb-6">
@@ -860,13 +1087,25 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
 
       {/* Summary */}
       <div className="w-full flex flex-col gap-3 mb-8">
-        {summary.map((s) => (
-          <div key={s.label} className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">{s.icon}</span>
-            <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">{s.label}</span>
-            <span className="text-[#e2e2e9] text-sm font-semibold">{s.value}</span>
+        <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">folder</span>
+          <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Projekt</span>
+          <span className="text-[#e2e2e9] text-sm font-semibold">{data.name}</span>
+        </div>
+        {data.budget && (
+          <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">payments</span>
+            <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Budget</span>
+            <span className="text-[#e2e2e9] text-sm font-semibold">{data.budget}</span>
           </div>
-        ))}
+        )}
+        {data.zeitrahmen && (
+          <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">schedule</span>
+            <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Zeitrahmen</span>
+            <span className="text-[#e2e2e9] text-sm font-semibold">{data.zeitrahmen}</span>
+          </div>
+        )}
         {data.leistungen.length > 0 && (
           <div className="flex items-start gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
             <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0 mt-0.5">auto_awesome</span>
@@ -880,15 +1119,22 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
             </div>
           </div>
         )}
+        {data.selectedFreelancerIds.length > 0 && (
+          <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">group</span>
+            <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Freelancer</span>
+            <span className="text-[#e2e2e9] text-sm font-semibold">{data.selectedFreelancerIds.length} ausgewählt</span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 w-full">
         <Link
-          href="/freelancer"
+          href="/projekte"
           className="w-full py-4 px-6 rounded-full font-bold text-sm tracking-wider uppercase transition-colors bg-[#D95D39] text-white hover:bg-[#c44e2e] text-center"
           onClick={onClose}
         >
-          Empfohlene Freelancer ansehen
+          Zu meinen Projekten
           <span className="material-symbols-outlined text-base leading-none ml-2 align-middle">arrow_forward</span>
         </Link>
         <button
@@ -905,6 +1151,7 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
 // ─── Main wizard orchestrator ─────────────────────────────────────────────────
 
 function Wizard({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
   const [step, setStep] = useState<WizardStep>("name");
   const [data, setData] = useState<WizardData>(defaultData);
 
@@ -919,16 +1166,18 @@ function Wizard({ onClose }: { onClose: () => void }) {
       "fragebogen-typ": "modus",
       fragebogen: "fragebogen-typ",
       empfehlung: "fragebogen",
+      aktivitaeten: "empfehlung",
+      "freelancer-auswahl": data.modus === "selbst" ? "zeitrahmen" : "aktivitaeten",
       leistungen: "modus",
-      budget: data.modus === "beratung" ? "empfehlung" : "leistungen",
+      budget: "leistungen",
       zeitrahmen: "budget",
     };
     return map[current] ?? "name";
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0D0F14] overflow-y-auto">
-      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0D0F14]/90 backdrop-blur border-b border-[#2D3139] flex items-center justify-between px-6 z-50">
+    <div className="fixed inset-0 z-[200] flex flex-col bg-[#0D0F14] overflow-y-auto">
+      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0D0F14]/90 backdrop-blur border-b border-[#2D3139] flex items-center justify-between px-6 z-[200]">
         <span className="font-heading text-xl text-[#e2e2e9] tracking-wider uppercase">
           Freelance.ch
         </span>
@@ -996,8 +1245,71 @@ function Wizard({ onClose }: { onClose: () => void }) {
             fragebogenTyp={data.fragebogenTyp}
             fragebogenA={data.fragebogenA}
             fragebogenB={data.fragebogenB}
-            onNext={(leistungen) => { merge({ leistungen }); setStep("budget"); }}
+            cache={data.kiCache}
+            onNext={(leistungen, aktivitaeten, kiCache) => { merge({ leistungen, aktivitaeten, kiCache }); setStep("aktivitaeten"); }}
             onBack={() => setStep(backFrom("empfehlung"))}
+          />
+        )}
+
+        {step === "aktivitaeten" && (
+          <StepAktivitaeten
+            initial={data.aktivitaeten}
+            onNext={(aktivitaeten) => { merge({ aktivitaeten }); setStep("freelancer-auswahl"); }}
+            onBack={() => setStep(backFrom("aktivitaeten"))}
+          />
+        )}
+
+        {step === "freelancer-auswahl" && data.modus === "selbst" && (
+          <StepFreelancerAuswahl
+            apiPath="/api/leistungen-freelancers"
+            aktivitaeten={data.leistungen}
+            initialGruppen={data.flAuswahlCache}
+            initialSelected={data.selectedFreelancerIds}
+            onDone={(gruppen, selectedFreelancerIds) => {
+              merge({ flAuswahlCache: gruppen, selectedFreelancerIds });
+              const beschreibung = data.leistungen.length > 0
+                ? `Gesucht: ${data.leistungen.join(", ")}.${data.budget ? ` Budget: ${data.budget}.` : ""}${data.zeitrahmen ? ` Zeitrahmen: ${data.zeitrahmen}.` : ""}`
+                : "";
+              erstelleProjekt({
+                name: data.name,
+                beschreibung,
+                leistungen: data.leistungen,
+                budget: data.budget,
+                zeitrahmen: data.zeitrahmen,
+                modus: "selbst",
+                freelancerIds: selectedFreelancerIds,
+              }).then((res) => {
+                if (res?.error) console.error("erstelleProjekt:", res.error);
+                else router.refresh();
+              });
+              setStep("matching");
+            }}
+            onBack={() => setStep(backFrom("freelancer-auswahl"))}
+          />
+        )}
+
+        {step === "freelancer-auswahl" && data.modus === "beratung" && (
+          <StepFreelancerAuswahl
+            aktivitaeten={data.aktivitaeten}
+            initialGruppen={data.flAuswahlCache}
+            initialSelected={data.selectedFreelancerIds}
+            onDone={(gruppen, selectedFreelancerIds) => {
+              merge({ flAuswahlCache: gruppen, selectedFreelancerIds });
+              erstelleProjekt({
+                name: data.name,
+                beschreibung: data.beschreibung,
+                leistungen: data.leistungen,
+                budget: null,
+                zeitrahmen: null,
+                modus: "beratung",
+                freelancerIds: selectedFreelancerIds,
+              }).then((res) => {
+                if (res?.error) console.error("erstelleProjekt:", res.error);
+                else router.refresh();
+              });
+              setStep("matching");
+            }}
+            onBack={() => setStep(backFrom("freelancer-auswahl"))}
           />
         )}
 
@@ -1022,22 +1334,13 @@ function Wizard({ onClose }: { onClose: () => void }) {
             initial={data.zeitrahmen}
             onNext={(zeitrahmen) => {
               merge({ zeitrahmen });
-              erstelleProjekt({
-                name: data.name,
-                beschreibung: data.beschreibung,
-                leistungen: data.leistungen,
-                budget: data.budget,
-                zeitrahmen,
-                modus: data.modus ?? "selbst",
-              }).catch(() => {});
-              setStep("matching");
+              setStep("freelancer-auswahl");
             }}
             onBack={() => setStep(backFrom("zeitrahmen"))}
           />
         )}
 
-        {step === "matching" && data.modus === "selbst" && <StepMatching data={data} onClose={onClose} />}
-        {step === "matching" && data.modus === "beratung" && <StepAbschluss data={data} onClose={onClose} />}
+        {step === "matching" && <StepAbschluss data={data} onClose={onClose} />}
       </main>
     </div>
   );

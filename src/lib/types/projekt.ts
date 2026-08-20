@@ -1,11 +1,11 @@
 export interface Teilaufgabe {
   titel: string;
   fortschrittProzent: number;
-  freelancerName: string;
-  freelancerRolle: string;
-  betragChf: number;
-  frist: string;
-  letzteNachricht: string;
+  freelancerName?: string;
+  freelancerRolle?: string;
+  betragChf?: number;
+  frist?: string;
+  letzteNachricht?: string;
 }
 
 export interface Projekt {

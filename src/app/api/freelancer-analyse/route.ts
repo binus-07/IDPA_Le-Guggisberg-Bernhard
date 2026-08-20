@@ -9,13 +9,20 @@ Du erhältst drei CSV-Datensätze:
 2) Projekte: Freelancer_ID, Titel, Bewertung (1–5), Beschreibung — Rohdaten für Erfahrung und Qualität
 3) Marketing-Aktivitäten: Rolle, Kategorie, Aktivitaet, Beschreibung
 
+WICHTIGSTE REGEL: Die "Gewünschte Leistungen" des Kunden haben ABSOLUTE PRIORITÄT.
+Wähle NUR Freelancer, deren Rolle zu diesen Leistungen passt.
+Ignoriere Freelancer mit nicht passenden Rollen — auch wenn sie bessere Bewertungen haben.
+Erst wenn keine Freelancer die Leistungen direkt abdecken, wähle die nächstverwandten.
+
 Verknüpfe Freelancer und Marketing-Aktivitäten über die Rolle.
 Berechne für jeden Freelancer die Ø-Bewertung aus den Projekten.
+Wähle unter den passenden Freelancern jene mit der besten Ø-Bewertung.
+
 Antworte IMMER mit exakt diesem JSON-Objekt (kein Markdown, kein Text drumherum):
 {
   "empfehlung": string,       // 2–3 Sätze auf Deutsch: warum diese Freelancer passen
   "freelancer_ids": string[], // 1–3 IDs der am besten passenden Freelancer
-  "aktivitaeten": string[]    // 2–4 konkrete Aktivitäten aus dem Marketing-Aktivitäten-CSV
+  "aktivitaeten": string[]    // 2–4 konkrete Aktivitäten aus dem Marketing-Aktivitäten-CSV, passend zu den gewünschten Leistungen
 }`;
 
 // ─── CSV builders ─────────────────────────────────────────────────────────────
@@ -54,7 +61,11 @@ function buildAktivitaetenCsv(rows: Row[]): string {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { frage, rolle } = body as { frage?: string; rolle?: string };
+  const { frage, rolle, leistungen } = body as {
+    frage?: string;
+    rolle?: string;
+    leistungen?: string[];
+  };
 
   if (!frage?.trim()) {
     return NextResponse.json({ error: "Frage fehlt" }, { status: 400 });
@@ -67,7 +78,6 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createClient();
 
-  // Fetch freelancer rows (optional filter by Rolle)
   let flQuery = supabase
     .from("freelancer")
     .select("freelancer_id,vorname,nachname,rolle,jahre_taetig,bezahlung_chf,kurzbeschreibung");
@@ -75,7 +85,6 @@ export async function POST(req: NextRequest) {
   const { data: freelancerRows, error: flError } = await flQuery;
   if (flError) return NextResponse.json({ error: "Supabase: freelancer" }, { status: 502 });
 
-  // Fetch raw project data for those freelancers
   const ids = (freelancerRows ?? []).map((f) => f.freelancer_id);
   let projekteRows: Row[] = [];
   if (ids.length > 0) {
@@ -86,7 +95,6 @@ export async function POST(req: NextRequest) {
     if (!error) projekteRows = (data ?? []) as Row[];
   }
 
-  // Fetch marketing activities (optional filter by Rolle)
   let mktQuery = supabase
     .from("marketing_aktivitaeten")
     .select("rolle,kategorie,aktivitaet,beschreibung");
@@ -94,16 +102,21 @@ export async function POST(req: NextRequest) {
   const { data: aktivRows, error: aktivError } = await mktQuery;
   if (aktivError) return NextResponse.json({ error: "Supabase: marketing_aktivitaeten" }, { status: 502 });
 
-  // Build prompt
   const freelancerCsv = buildFreelancerCsv((freelancerRows ?? []) as Row[]);
   const projekteCsv = buildProjekteCsv(projekteRows);
   const aktivitaetenCsv = buildAktivitaetenCsv((aktivRows ?? []) as Row[]);
 
+  // Put leistungen at the top so the AI sees them first
+  const leistungenLine = leistungen?.length
+    ? `GEWÜNSCHTE LEISTUNGEN (höchste Priorität): ${leistungen.join(", ")}\n\n`
+    : "";
+
   const userMessage =
+    `${leistungenLine}` +
     `Freelancer:\n${freelancerCsv}\n\n` +
     `Projekte:\n${projekteCsv}\n\n` +
     `Marketing-Aktivitäten:\n${aktivitaetenCsv}\n\n` +
-    `Frage: ${frage}`;
+    `Projektbeschreibung: ${frage}`;
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
