@@ -45,7 +45,8 @@ export async function onboarding(submitData: OnboardingSubmitData): Promise<Onbo
 
   const { error } = await supabase
     .from("profiles")
-    .update({
+    .upsert({
+      id: user.id,
       rolle: parsed.data.rolle,
       anzeigename: parsed.data.anzeigename,
       firmenname: parsed.data.firmenname ?? null,
