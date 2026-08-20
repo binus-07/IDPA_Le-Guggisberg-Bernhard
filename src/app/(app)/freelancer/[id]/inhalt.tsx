@@ -1,13 +1,16 @@
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
-import { Seitentitel } from "@/components/seitentitel";
 import { Sternebewertung } from "@/components/sternebewertung";
 import { FreelancerSkills } from "@/components/freelancer-skills";
+import { ZurueckPfeil } from "@/components/zurueck-pfeil";
 import type { Freelancer } from "@/lib/types/freelancer";
 
 export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer }) {
   return (
     <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-8 pb-24 md:px-10 lg:px-16 lg:pt-16 xl:px-[131px]">
-      <Seitentitel titel="Auswahl" zurueckHref="/marketing-planung" zurueckLabel="Auswahl" />
+      <div className="flex items-center gap-4 sm:gap-6">
+        <ZurueckPfeil label="Zurück" />
+        <h1 className="text-page-title text-foreground">Freelancer</h1>
+      </div>
 
       <div className="flex flex-col gap-12 rounded-lg bg-card p-6 sm:p-10 lg:p-12">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">

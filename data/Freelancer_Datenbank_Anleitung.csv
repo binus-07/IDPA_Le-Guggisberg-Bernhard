@@ -1,0 +1,22 @@
+﻿Freelancer-Datenbank – Anleitung
+""
+Zweck
+Dieses Workbook enthält 30 fiktive Freelancer-Profile (5 pro Kategorie, 6 Kategorien) als Beispieldaten für eure Plattform. Alle Texte sind frei erfunden, in Ich-Form geschrieben und sollen wie echte Freelancer-Profile wirken. Namen, Firmen und Projekte sind rein fiktiv.
+""
+Aufbau
+Tab 'Freelancer': ein Datensatz pro Person mit allen Profil-Angaben, inkl. Ranking innerhalb der Kategorie. Tab 'Projekte': ein Datensatz pro bisherigem Projekt (3 pro Freelancer), verknüpft über die Spalte 'Freelancer-ID'. Diese Aufteilung entspricht einer normalisierten Datenbankstruktur (1 Freelancer -> N Projekte) und lässt sich direkt in eine echte Datenbank (z.B. zwei SQL-Tabellen) übernehmen.
+""
+Verknüpfung mit der Aktivitäten-Datei (für die ChatGPT-API-Anbindung)
+Die Spalte 'Freelancer-Tätigkeit' verwendet bewusst dieselbe, ungegenderte Rollenbezeichnung wie die Spalte 'Freelancer-Rolle' in 'Freelancer_Marketing_Aktivitaeten_mit_ID.xlsx' (z.B. 'Videograf', nicht 'Videograf/in'). So könnt ihr beide Tabellen 1:1 über den Rollennamen verknüpfen (JOIN). Die neue Spalte 'Tätigkeiten-ID-Bereich' zeigt zusätzlich, welche Tätigkeiten-IDs (aus der Aktivitäten-Datei) zu dieser Rolle gehören. Ablauf für die Matching-Logik: 1) Die KI ordnet die Fragebogen-Antworten passenden Tätigkeiten-IDs zu (Datei 'Freelancer_Marketing_Aktivitaeten_mit_ID.xlsx') 2) über die Spalte 'Freelancer-Rolle' der jeweiligen ID wird die passende Kategorie ermittelt 3) alle Freelancer mit dieser 'Freelancer-Tätigkeit' werden vorgeschlagen, sortiert z.B. nach Rang oder Bewertung.
+""
+Ranking
+Innerhalb jeder Kategorie ist Rang 1 die Person mit den meisten Jahren Berufserfahrung, absteigend bis zum jüngsten Profil. Die Freelancer-ID kodiert Kategorie und Rang, z.B. 'FOTO-01' = erfahrenste Fotografin/erfahrenster Fotograf.
+""
+Bezahlung pro Projekt
+Die Spalte 'Ø Bezahlung pro Projekt (CHF)' im Tab 'Freelancer' zeigt einen für die Kategorie und Erfahrungsstufe typischen Richtwert: mehr Jahre Erfahrung bedeuten linear ansteigend einen höheren Satz (z.B. Videograf: CHF 700 bei 1 Jahr bis CHF 4'200 bei 15 Jahren). Im Tab 'Projekte' hat jedes einzelne Projekt zusätzlich ein individuelles 'Honorar (CHF)', das leicht um diesen Basissatz schwankt (kleineres/mittleres/grösseres Projekt), damit die Zahlen nicht künstlich identisch wirken. Wichtig: Diese Sätze sind eigene, plausible Annahmen für den Prototyp und keine recherchierten Marktdaten – für ein echtes Angebot solltet ihr sie mit realen Freelancer-Tagessätzen abgleichen.
+""
+Bildquellen (gratis, ohne Login nutzbar)
+"Profilfotos: randomuser.me – ein kostenloser Dienst, der realistische Portraitfotos speziell für Test- und Mockup-Zwecke bereitstellt (keine echten Personen, keine Lizenzprobleme). Projekt-/Aktivitätsbilder: picsum.photos (Lorem Picsum) – ein kostenloser Platzhalter-Bilddienst mit lizenzfreien Fotos, aufgerufen über einen festen 'Seed', damit jedes Bild stabil und reproduzierbar bleibt. Beide Dienste benötigen keinen API-Key und können direkt als Bild-URL (<img src=""..."">) in eurer Webapp verwendet werden."
+""
+Hinweis zu den Bildern
+Die Picsum-Bilder sind thematisch generisch (echte, aber zufällige Stockfotos) und nicht inhaltlich exakt auf jedes Projekt abgestimmt. Für den Prototyp reicht das völlig aus. Wollt ihr später passgenauere Bilder, könnt ihr die gleichen Zeilen mit selbst ausgesuchten Fotos von Unsplash oder Pexels ersetzen – die Spaltenstruktur bleibt dabei unverändert.
