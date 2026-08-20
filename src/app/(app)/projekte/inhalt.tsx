@@ -1,5 +1,6 @@
 import { ProjektZeile } from "@/components/projekt-zeile";
 import { Seitentitel } from "@/components/seitentitel";
+import { NeuProjektButton } from "./neu-projekt-wizard";
 import type { Projekt } from "@/lib/types/projekt";
 
 /**
@@ -10,7 +11,10 @@ import type { Projekt } from "@/lib/types/projekt";
 export function ProjekteUebersichtInhalt({ projekte }: { projekte: Projekt[] }) {
   return (
     <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-12 px-6 pt-8 pb-24 md:px-10 lg:px-16 lg:pt-16 xl:px-[131px]">
-      <Seitentitel titel="Projekte" />
+      <div className="flex items-center justify-between gap-6">
+        <Seitentitel titel="Projekte" />
+        <NeuProjektButton />
+      </div>
       <div className="flex flex-col gap-10">
         {projekte.length > 0 ? (
           projekte.map((projekt) => <ProjektZeile key={projekt.id} projekt={projekt} />)
