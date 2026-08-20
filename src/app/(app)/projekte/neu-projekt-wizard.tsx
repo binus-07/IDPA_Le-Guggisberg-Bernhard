@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
-import { getFreelancers } from "@/lib/mock/freelancer";
 import Link from "next/link";
 import { erstelleProjekt } from "./actions";
 import {
@@ -377,40 +376,52 @@ function StepEmpfehlung({
   const [recommended, setRecommended] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [tipps, setTipps] = useState<{ icon: string; text: string }[]>([]);
-  const freelancer = getFreelancers().slice(0, 3);
+  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>([]);
+  const [flEmpfehlung, setFlEmpfehlung] = useState<string | null>(null);
+  const [aktivitaeten, setAktivitaeten] = useState<string[]>([]);
 
   useEffect(() => {
     const icons = ["description", "bar_chart", "handshake"];
-    fetch("/api/ki-analyse", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (typeof data.strategie === "string" && data.strategie.trim()) {
-          setStrategie(data.strategie.trim());
-        }
-        const valid = (data.leistungen as string[] ?? []).filter((l) =>
-          ALLE_LEISTUNGEN_LABELS.includes(l)
-        );
+    Promise.allSettled([
+      fetch("/api/ki-analyse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
+      }).then((r) => r.json()),
+      fetch("/api/freelancer-analyse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ frage: beschreibung }),
+      }).then((r) => r.json()),
+    ]).then(async ([kiResult, flResult]) => {
+      if (kiResult.status === "fulfilled") {
+        const data = kiResult.value;
+        if (typeof data.strategie === "string" && data.strategie.trim()) setStrategie(data.strategie.trim());
+        const valid = (data.leistungen as string[] ?? []).filter((l) => ALLE_LEISTUNGEN_LABELS.includes(l));
         const recs = valid.length > 0 ? valid : empfohleneleistungen(beschreibung);
         setRecommended(recs);
         setSelected(recs);
         const rawTipps = Array.isArray(data.tipps) && data.tipps.length > 0 ? data.tipps : null;
-        setTipps(
-          rawTipps
-            ? rawTipps.slice(0, 3).map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text }))
-            : TIPPS
-        );
-      })
-      .catch(() => {
+        setTipps(rawTipps ? rawTipps.slice(0, 3).map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text })) : TIPPS);
+      } else {
         const recs = empfohleneleistungen(beschreibung);
         setRecommended(recs);
         setSelected(recs);
         setTipps(TIPPS);
-      })
-      .finally(() => setLoading(false));
+      }
+      if (flResult.status === "fulfilled") {
+        const res = flResult.value;
+        const ids: string[] = Array.isArray(res.freelancer_ids) ? res.freelancer_ids : [];
+        if (ids.length > 0) {
+          try {
+            const fl = await fetch(`/api/freelancers?ids=${ids.join(",")}`).then((r) => r.json());
+            setFreelancer(Array.isArray(fl) ? fl : []);
+          } catch {}
+        }
+        if (typeof res.empfehlung === "string" && res.empfehlung.trim()) setFlEmpfehlung(res.empfehlung.trim());
+        if (Array.isArray(res.aktivitaeten)) setAktivitaeten(res.aktivitaeten);
+      }
+    }).finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (v: string) =>
@@ -489,33 +500,58 @@ function StepEmpfehlung({
       </div>
 
       {/* Empfohlene Freelancer */}
-      <div className="w-full mb-8">
-        <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7] mb-4">
-          Passende Freelancer
-        </p>
-        <div className="grid grid-cols-3 gap-4">
-          {freelancer.map((f) => (
-            <div
-              key={f.id}
-              className="flex flex-col items-center bg-[#1A1D24] border border-[#2D3139] rounded-xl p-4 text-center"
-            >
-              <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
-                <PlatzhalterBild
-                  alt={`Portrait von ${f.name}`}
-                  radius="card"
-                  className="absolute inset-0 h-full w-full"
-                />
-              </div>
-              <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
-              <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
-              <div className="flex text-[#D95D39] text-sm" aria-hidden="true">★★★★★</div>
-              <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
-                Empfohlen
-              </div>
+      {(freelancer.length > 0 || flEmpfehlung) && (
+        <div className="w-full mb-8">
+          <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7] mb-4">
+            Passende Freelancer
+          </p>
+          {flEmpfehlung && (
+            <p className="text-[#dfc0b7] text-sm mb-4 leading-relaxed">{flEmpfehlung}</p>
+          )}
+          {freelancer.length > 0 && (
+            <div className="grid grid-cols-3 gap-4">
+              {freelancer.map((f) => (
+                <Link
+                  key={f.id}
+                  href={`/freelancer/${f.id}`}
+                  className="flex flex-col items-center bg-[#1A1D24] border border-[#2D3139] rounded-xl p-4 text-center hover:border-[#D95D39]/50 transition-colors"
+                >
+                  <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
+                    <PlatzhalterBild
+                      alt={`Portrait von ${f.name}`}
+                      radius="card"
+                      className="absolute inset-0 h-full w-full"
+                    />
+                  </div>
+                  <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
+                  <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
+                  <div className="flex text-[#D95D39] text-sm" aria-hidden="true">★★★★★</div>
+                  <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
+                    Empfohlen
+                  </div>
+                </Link>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      </div>
+      )}
+
+      {/* Empfohlene Aktivitäten */}
+      {aktivitaeten.length > 0 && (
+        <div className="w-full mb-8">
+          <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7] mb-4">
+            Empfohlene Marketing-Aktivitäten
+          </p>
+          <div className="flex flex-col gap-3">
+            {aktivitaeten.map((a, i) => (
+              <div key={i} className="flex items-start gap-3 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-4 py-3">
+                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none mt-0.5 flex-shrink-0">campaign</span>
+                <p className="text-[#dfc0b7] text-sm leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Weitere Tipps */}
       <div className="w-full mb-2">
@@ -700,7 +736,30 @@ function StepZeitrahmen({
 }
 
 function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void }) {
-  const freelancer = getFreelancers().slice(0, 3);
+  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>([]);
+  const [loadingMatch, setLoadingMatch] = useState(true);
+
+  useEffect(() => {
+    const frage = data.leistungen.length > 0
+      ? `Ich suche Freelancer für: ${data.leistungen.join(", ")}.`
+      : "Ich suche passende Marketing-Freelancer.";
+    fetch("/api/freelancer-analyse", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ frage }),
+    })
+      .then((r) => r.json())
+      .then(async (res) => {
+        const ids: string[] = Array.isArray(res.freelancer_ids) ? res.freelancer_ids : [];
+        if (ids.length > 0) {
+          const fl = await fetch(`/api/freelancers?ids=${ids.join(",")}`).then((r) => r.json());
+          setFreelancer(Array.isArray(fl) ? fl : []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingMatch(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <div className="w-16 h-16 rounded-full bg-[#D95D39]/15 border border-[#D95D39]/30 flex items-center justify-center mb-6">
@@ -711,7 +770,7 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
       </h1>
       <p className="text-[#dfc0b7] text-base mb-3 text-center">
         Basierend auf deinen Angaben haben wir{" "}
-        <span className="text-[#D95D39] font-semibold">{freelancer.length} Freelancer</span> für{" "}
+        <span className="text-[#D95D39] font-semibold">{loadingMatch ? "..." : freelancer.length} Freelancer</span> für{" "}
         <span className="text-[#e2e2e9] font-semibold">«{data.name}»</span> gefunden.
       </p>
       {data.leistungen.length > 0 && (
@@ -726,30 +785,38 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
           ))}
         </div>
       )}
-      <div className="grid grid-cols-3 gap-4 w-full mb-8">
-        {freelancer.map((f) => (
-          <div
-            key={f.id}
-            className="flex flex-col items-center bg-[#1A1D24] border border-[#2D3139] rounded-xl p-4 text-center"
-          >
-            <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
-              <PlatzhalterBild
-                alt={`Portrait von ${f.name}`}
-                radius="card"
-                className="absolute inset-0 h-full w-full"
-              />
-            </div>
-            <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
-            <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
-            <div className="flex text-[#D95D39] text-sm" aria-hidden="true">
-              ★★★★★
-            </div>
-            <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
-              Match
-            </div>
-          </div>
-        ))}
-      </div>
+      {loadingMatch ? (
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-8">
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">autorenew</span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">Freelancer werden gesucht...</span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-4 w-full mb-8">
+          {freelancer.map((f) => (
+            <Link
+              key={f.id}
+              href={`/freelancer/${f.id}`}
+              className="flex flex-col items-center bg-[#1A1D24] border border-[#2D3139] rounded-xl p-4 text-center hover:border-[#D95D39]/50 transition-colors"
+            >
+              <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
+                <PlatzhalterBild
+                  alt={`Portrait von ${f.name}`}
+                  radius="card"
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+              <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
+              <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
+              <div className="flex text-[#D95D39] text-sm" aria-hidden="true">
+                ★★★★★
+              </div>
+              <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
+                Match
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
       <div className="flex flex-col gap-3 w-full">
         <Link
           href="/freelancer"
