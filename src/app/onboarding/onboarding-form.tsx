@@ -12,8 +12,6 @@ type OnboardingData = {
   // Unternehmen
   branche: string | null;
   unternehmensgroesse: string | null;
-  gesuchte_leistungen: string[];
-  dringlichkeit: string | null;
   // Freelancer
   spezialisierungen: string[];
   branchen_erfahrung: string[];
@@ -29,8 +27,6 @@ const defaultData: OnboardingData = {
   firmenname: "",
   branche: null,
   unternehmensgroesse: null,
-  gesuchte_leistungen: [],
-  dringlichkeit: null,
   spezialisierungen: [],
   branchen_erfahrung: [],
   erfahrung_jahre: "",
@@ -481,90 +477,6 @@ function StepUnternehmenGroesse({
   );
 }
 
-// ─── Step 4 (Unternehmen): Gesuchte Leistungen ─────────────────────────────────
-
-function StepUnternehmenLeistungen({
-  initial,
-  onNext,
-  onBack,
-}: {
-  initial: string[];
-  onNext: (leistungen: string[]) => void;
-  onBack: () => void;
-}) {
-  const [selected, setSelected] = useState<string[]>(initial);
-  const toggle = (v: string) =>
-    setSelected((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
-  return (
-    <div className="w-full max-w-2xl flex flex-col items-center">
-      <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
-        Was sucht ihr?
-      </h1>
-      <p className="text-[#dfc0b7] text-base mb-10 text-center">
-        Wähle alle Bereiche aus, in denen du aktuell oder zukünftig Unterstützung benötigst.
-      </p>
-      <ChipGrid
-        options={LEISTUNGEN}
-        selected={selected}
-        onToggle={toggle}
-        icons={LEISTUNGEN_ICONS}
-      />
-      <NavButtons
-        onNext={() => onNext(selected)}
-        onBack={onBack}
-        nextDisabled={selected.length === 0}
-      />
-    </div>
-  );
-}
-
-// ─── Step 5 (Unternehmen): Dringlichkeit ───────────────────────────────────────
-
-const DRINGLICHKEIT = [
-  { label: "Sofort", description: "Wir brauchen jemanden diese Woche." },
-  { label: "Bald", description: "Innerhalb eines Monats." },
-  { label: "Langfristig planen", description: "Kein fixer Startzeitpunkt." },
-  { label: "Wir evaluieren noch Optionen", description: "Noch keine konkrete Anfrage." },
-];
-
-function StepUnternehmenDringlichkeit({
-  initial,
-  onNext,
-  onBack,
-}: {
-  initial: string | null;
-  onNext: (dringlichkeit: string) => void;
-  onBack: () => void;
-}) {
-  const [selected, setSelected] = useState<string | null>(initial);
-  return (
-    <div className="w-full max-w-lg flex flex-col items-center">
-      <h1 className="font-heading text-5xl text-[#e2e2e9] mb-3 text-center tracking-wide">
-        Wie dringend ist euer erstes Projekt?
-      </h1>
-      <p className="text-[#dfc0b7] text-base mb-10 text-center">
-        Dies hilft uns, die Verfügbarkeit passender Freelancer optimal abzustimmen.
-      </p>
-      <div className="flex flex-col gap-3 w-full">
-        {DRINGLICHKEIT.map((opt) => (
-          <RadioCard
-            key={opt.label}
-            label={opt.label}
-            description={opt.description}
-            selected={selected === opt.label}
-            onSelect={() => setSelected(opt.label)}
-          />
-        ))}
-      </div>
-      <NavButtons
-        onNext={() => selected && onNext(selected)}
-        onBack={onBack}
-        nextDisabled={!selected}
-      />
-    </div>
-  );
-}
-
 // ─── Step 2 (Freelancer): Spezialisierung ──────────────────────────────────────
 
 function StepFreelancerSpezialisierung({
@@ -929,8 +841,8 @@ export function OnboardingForm() {
 
     const nextStep = step + 1;
     const willBeWelcome =
-      (merged.rolle === "unternehmen" && nextStep === 6) ||
-      (merged.rolle === "freelancer" && nextStep === 7);
+      (merged.rolle === "unternehmen" && nextStep === 4) ||
+      (merged.rolle === "freelancer" && nextStep === 6);
 
     if (willBeWelcome) {
       setSubmitError(null);
@@ -941,8 +853,6 @@ export function OnboardingForm() {
           firmenname: merged.firmenname || undefined,
           branche: merged.branche ?? undefined,
           unternehmensgroesse: merged.unternehmensgroesse ?? undefined,
-          gesuchte_leistungen: merged.gesuchte_leistungen,
-          dringlichkeit: merged.dringlichkeit ?? undefined,
           spezialisierungen: merged.spezialisierungen,
           branchen_erfahrung: merged.branchen_erfahrung,
           erfahrung_jahre: merged.erfahrung_jahre || undefined,
@@ -961,9 +871,9 @@ export function OnboardingForm() {
     }
   };
 
-  const totalSteps = data.rolle === "freelancer" ? 7 : 6;
+  const totalSteps = data.rolle === "freelancer" ? 6 : 4;
   const isWelcome =
-    (data.rolle === "unternehmen" && step === 6) || (data.rolle === "freelancer" && step === 7);
+    (data.rolle === "unternehmen" && step === 4) || (data.rolle === "freelancer" && step === 6);
 
   const renderStep = () => {
     if (isWelcome) return <StepWillkommen rolle={data.rolle!} />;
@@ -1014,13 +924,7 @@ export function OnboardingForm() {
           />
         );
       case 4:
-        return data.rolle === "unternehmen" ? (
-          <StepUnternehmenLeistungen
-            initial={data.gesuchte_leistungen}
-            onNext={(gesuchte_leistungen) => advance({ gesuchte_leistungen })}
-            onBack={back}
-          />
-        ) : (
+        return (
           <StepFreelancerBio
             initial={{ erfahrung_jahre: data.erfahrung_jahre, bio: data.bio }}
             onNext={(d) => advance(d)}
@@ -1028,13 +932,7 @@ export function OnboardingForm() {
           />
         );
       case 5:
-        return data.rolle === "unternehmen" ? (
-          <StepUnternehmenDringlichkeit
-            initial={data.dringlichkeit}
-            onNext={(dringlichkeit) => advance({ dringlichkeit })}
-            onBack={back}
-          />
-        ) : (
+        return (
           <StepFreelancerVerfuegbarkeit
             initial={{ verfuegbarkeit: data.verfuegbarkeit, verfuegbar_ab: data.verfuegbar_ab }}
             onNext={(d) => advance(d)}
@@ -1042,13 +940,13 @@ export function OnboardingForm() {
           />
         );
       case 6:
-        return data.rolle === "freelancer" ? (
+        return (
           <StepFreelancerPortfolio
             onNext={() => advance()}
             onBack={back}
             onSkip={() => advance()}
           />
-        ) : null;
+        );
       default:
         return null;
     }
