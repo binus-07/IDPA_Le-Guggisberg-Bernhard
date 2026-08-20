@@ -14,6 +14,8 @@ export function TeilaufgabeZeile({ teilaufgabe }: { teilaufgabe: Teilaufgabe }) 
       <PlatzhalterBild
         alt=""
         radius="image"
+        src={teilaufgabe.bildSrc}
+        sizes="(min-width: 640px) 352px, 280px"
         className="aspect-[352/218] w-full max-w-[280px] shrink-0 sm:max-w-[352px]"
       />
       <div className="flex min-w-0 flex-1 flex-col gap-3">

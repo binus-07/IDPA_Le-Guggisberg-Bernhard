@@ -38,7 +38,12 @@ export default function Home() {
           <h2 className="text-section-label text-foreground">Freelancer-Kategorien</h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {kategorien.map((kategorie) => (
-              <BildKarte key={kategorie.id} label={kategorie.name} bildAlt="" />
+              <BildKarte
+                key={kategorie.id}
+                label={kategorie.name}
+                bildAlt=""
+                bildSrc={kategorie.bildSrc}
+              />
             ))}
           </div>
         </section>

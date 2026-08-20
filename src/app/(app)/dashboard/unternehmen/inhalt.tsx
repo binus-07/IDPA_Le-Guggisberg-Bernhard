@@ -33,6 +33,7 @@ export function UnternehmenDashboardInhalt({
           ctaHref="/marketing-planung"
           ctaLabel="Plan erstellen"
           bildAlt=""
+          bildSrc="/mock/promo-produkt.jpg"
           spiegel={false}
         />
         <PromoKachel
@@ -42,6 +43,7 @@ export function UnternehmenDashboardInhalt({
           ctaHref="/marketing-planung"
           ctaLabel="Plan erstellen"
           bildAlt=""
+          bildSrc="/mock/promo-marke.jpg"
           spiegel
         />
       </section>
@@ -50,7 +52,12 @@ export function UnternehmenDashboardInhalt({
         <h2 className="text-h2 text-foreground">Freelancer-Kategorien</h2>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
           {kategorien.map((kategorie) => (
-            <BildKarte key={kategorie.id} label={kategorie.name} bildAlt="" />
+            <BildKarte
+              key={kategorie.id}
+              label={kategorie.name}
+              bildAlt=""
+              bildSrc={kategorie.bildSrc}
+            />
           ))}
         </div>
       </section>

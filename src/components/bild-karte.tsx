@@ -9,20 +9,35 @@ export function BildKarte({
   label,
   href,
   bildAlt,
+  bildSrc,
 }: {
   label: string;
   href?: string;
   bildAlt: string;
+  bildSrc?: string;
 }) {
   const inhalt = (
-    <div className={cn("card-hover relative h-48 min-w-0 overflow-hidden rounded-xl border border-border group", href && "cursor-pointer")}>
+    <div
+      className={cn(
+        "card-hover relative h-48 min-w-0 overflow-hidden rounded-xl border border-border group",
+        href && "cursor-pointer",
+      )}
+    >
       <PlatzhalterBild
         alt={bildAlt}
         radius="card"
-        className="absolute inset-0 h-full w-full opacity-60 transition-transform duration-500 group-hover:scale-105"
+        src={bildSrc}
+        sizes="(min-width: 1280px) 16vw, (min-width: 768px) 25vw, 50vw"
+        className={cn(
+          "absolute inset-0 h-full w-full transition-transform duration-500 group-hover:scale-105",
+          !bildSrc && "opacity-60",
+        )}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-      <p className="absolute bottom-4 left-4 font-heading font-normal text-white" style={{ fontSize: "24px", lineHeight: "1.2" }}>
+      <p
+        className="absolute bottom-4 left-4 font-heading font-normal text-white"
+        style={{ fontSize: "24px", lineHeight: "1.2" }}
+      >
         {label}
       </p>
     </div>

@@ -4,6 +4,7 @@ export interface BisherigesProjekt {
   kommentar: string;
   datum: string;
   bewertung: number;
+  bildSrc?: string;
 }
 
 export interface Freelancer {
@@ -19,4 +20,5 @@ export interface Freelancer {
   bisherigeProjekte?: BisherigesProjekt[];
   /** Steuert das Stern-Abzeichen (Screen 2 Karte 1, alle Top-Freelancer auf Screen 1). */
   empfohlen: boolean;
+  bildSrc?: string;
 }

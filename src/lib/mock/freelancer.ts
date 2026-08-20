@@ -16,6 +16,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Mein Fokus liegt auf Architektur- und Immobilienfotografie klare Linien, natürliches Licht, kein Schnickschnack.",
     empfohlen: true,
+    bildSrc: "/mock/freelancer-hannes.jpg",
   },
   {
     id: "lena",
@@ -25,6 +26,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Ich bin Lena aus Zürich und spezialisiere mich auf Produkt- und E-Commerce-Fotografie. Meine Kunden schätzen saubere Bildwelten, schnelle Lieferung und einen unkomplizierten",
     empfohlen: false,
+    bildSrc: "/mock/freelancer-lena.jpg",
   },
   {
     id: "marco",
@@ -34,6 +36,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Basler mit Tessiner Wurzeln, spezialisiert auf Corporate- und Event-Fotografie für Unternehmen aus Pharma, Finance und Tech. Ich schaffe Bildwelten, die zur Marke passen.",
     empfohlen: false,
+    bildSrc: "/mock/freelancer-marco.jpg",
   },
   {
     id: "selin",
@@ -43,6 +46,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Ich bin Selin aus Bern und mein Fokus liegt auf People-Fotografie. Portraits, Team-Shootings und echte Emotionen. Menschen so zu zeigen wie sie wirklich sind, das ist mein",
     empfohlen: false,
+    bildSrc: "/mock/freelancer-selin.jpg",
   },
   {
     id: "dominic",
@@ -52,6 +56,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Food- und Gastronomiefotograf ich verstehe das Handwerk hinter gutem Essen und übersetze es ins Bild. Mehrere meiner Kunden haben seither Eingang in Restaurantguides",
     empfohlen: false,
+    bildSrc: "/mock/freelancer-dominic.jpg",
   },
   {
     id: "nina",
@@ -61,6 +66,7 @@ const FREELANCER: Freelancer[] = [
     beschreibung:
       "Ausgebildet an der Schule für Gestaltung St. Gallen, spezialisiert auf Social-Media-Content und Lifestyle-Fotografie. Ich denke von Anfang an in Formaten und liefere direkt",
     empfohlen: false,
+    bildSrc: "/mock/freelancer-nina.jpg",
   },
   {
     id: "thomas-wenger",
@@ -78,6 +84,7 @@ const FREELANCER: Freelancer[] = [
         kommentar: "„Schnelle Abwicklung, top Qualität — buchen wir definitiv wieder.“",
         datum: "November 2025",
         bewertung: 4,
+        bildSrc: "/mock/thomas-wenger-projekt-outdoor.jpg",
       },
       {
         titel: "Neue Website - Steuerberatungskanzlei",
@@ -86,6 +93,7 @@ const FREELANCER: Freelancer[] = [
         kommentar: "„Endlich Fotos, bei denen wir selbst finden, dass wir gut aussehen.“",
         datum: "Oktober 2025",
         bewertung: 5,
+        bildSrc: "/mock/thomas-wenger-projekt-steuerberatung.jpg",
       },
       {
         titel: "Jahresbericht-Fotografie - Maschinenbau-KMU",
@@ -95,14 +103,40 @@ const FREELANCER: Freelancer[] = [
           "„Professionell, pünktlich und hat Belegschaft auf Anhieb ins Herz geschlossen.“",
         datum: "Januar 2025",
         bewertung: 4,
+        bildSrc: "/mock/thomas-wenger-projekt-jahresbericht.jpg",
       },
     ],
     empfohlen: false,
+    bildSrc: "/mock/freelancer-thomas-wenger.jpg",
   },
-  { id: "anna", name: "Anna", rolle: "Web Grafikerin", empfohlen: true },
-  { id: "thomas-content-creator", name: "Thomas", rolle: "Content Creator", empfohlen: true },
-  { id: "matthaeus", name: "Matthäus", rolle: "Videograf", empfohlen: true },
-  { id: "melina", name: "Melina", rolle: "Grafikerin Print", empfohlen: true },
+  {
+    id: "anna",
+    name: "Anna",
+    rolle: "Web Grafikerin",
+    empfohlen: true,
+    bildSrc: "/mock/freelancer-anna.jpg",
+  },
+  {
+    id: "thomas-content-creator",
+    name: "Thomas",
+    rolle: "Content Creator",
+    empfohlen: true,
+    bildSrc: "/mock/freelancer-thomas-content-creator.jpg",
+  },
+  {
+    id: "matthaeus",
+    name: "Matthäus",
+    rolle: "Videograf",
+    empfohlen: true,
+    bildSrc: "/mock/freelancer-matthaeus.jpg",
+  },
+  {
+    id: "melina",
+    name: "Melina",
+    rolle: "Grafikerin Print",
+    empfohlen: true,
+    bildSrc: "/mock/freelancer-melina.jpg",
+  },
 ];
 
 // Screen 2 (Freelancer-Auswahl): Reihenfolge exakt wie im Mockup, Karte 1 = Hannes (Stern).

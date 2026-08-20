@@ -45,6 +45,7 @@ export function FreelancerDashboardInhalt({
                 key={projekt.id}
                 label={projekt.titel}
                 bildAlt=""
+                bildSrc={projekt.bildSrc}
                 href={`/projekte/${projekt.id}`}
               />
             ))}

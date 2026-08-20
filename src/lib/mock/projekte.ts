@@ -11,6 +11,7 @@ const PROJEKTE: Projekt[] = [
     titel: "Brack.alltron Mitarbeiter Plattform erstellen",
     auftragsbeschreibung:
       "Auftrag: Eine Webseite für die Mitarbeitenden von Brack.alltron, auf der interne Nachrichten sowie ein digitales Telefonbuch geführt werden. Dafür werden neue Fotos der Mitarbeitenden benötigt.",
+    bildSrc: "/mock/projekt-brack-alltron-banner.jpg",
     teilaufgaben: [
       {
         titel: "Webseite erstellen",
@@ -20,6 +21,7 @@ const PROJEKTE: Projekt[] = [
         betragChf: 4000,
         frist: "24. November 2026",
         letzteNachricht: "Ich habe jetzt die Domain lizensiert, hier ist die Rechnung",
+        bildSrc: "/mock/teilaufgabe-brack-alltron-website.jpg",
       },
       {
         titel: "Mitarbeiter fotografieren",
@@ -29,6 +31,7 @@ const PROJEKTE: Projekt[] = [
         betragChf: 1500,
         frist: "24. November 2026",
         letzteNachricht: "Ich habe die Fotos ausgewertet und werde sie jetzt final bearbeiten",
+        bildSrc: "/mock/teilaufgabe-brack-alltron-mitarbeiter-foto.jpg",
       },
       {
         titel: "Mockup designen",
@@ -39,6 +42,7 @@ const PROJEKTE: Projekt[] = [
         frist: "20. August 2026",
         letzteNachricht:
           "Schön, dass Ihnen das Mockup so gefällt, ich leite es weiter an Lukas für die Umsetzung",
+        bildSrc: "/mock/teilaufgabe-brack-alltron-mockup.jpg",
       },
     ],
   },
