@@ -6,6 +6,7 @@ export interface Teilaufgabe {
   betragChf: number;
   frist: string;
   letzteNachricht: string;
+  bildSrc?: string;
 }
 
 export interface Projekt {
@@ -13,4 +14,5 @@ export interface Projekt {
   titel: string;
   auftragsbeschreibung: string;
   teilaufgaben: Teilaufgabe[];
+  bildSrc?: string;
 }

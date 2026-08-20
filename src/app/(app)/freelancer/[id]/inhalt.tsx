@@ -14,6 +14,9 @@ export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer 
           <PlatzhalterBild
             alt={`Portrait von ${freelancer.name}`}
             radius="image"
+            src={freelancer.bildSrc}
+            sizes="(min-width: 1024px) 515px, (min-width: 640px) 360px, 280px"
+            priority
             className="aspect-[515/520] w-full max-w-[280px] shrink-0 sm:max-w-[360px] lg:max-w-[515px]"
           />
           <div className="flex flex-col gap-4 lg:max-w-[980px] lg:pt-2">
@@ -48,6 +51,8 @@ export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer 
                   <PlatzhalterBild
                     alt=""
                     radius="image"
+                    src={eintrag.bildSrc}
+                    sizes="(min-width: 640px) 352px, 280px"
                     className="aspect-[352/212] w-full max-w-[280px] shrink-0 sm:max-w-[352px]"
                   />
                   <div className="flex flex-col gap-2">

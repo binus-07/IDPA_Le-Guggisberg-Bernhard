@@ -19,6 +19,8 @@ export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
           <PlatzhalterBild
             alt={`Portrait von ${freelancer.name}`}
             radius="image"
+            src={freelancer.bildSrc}
+            sizes="(min-width: 1024px) 182px, (min-width: 640px) 150px, 120px"
             className="size-[120px] sm:size-[150px] lg:size-[182px]"
           />
           {freelancer.empfohlen ? (

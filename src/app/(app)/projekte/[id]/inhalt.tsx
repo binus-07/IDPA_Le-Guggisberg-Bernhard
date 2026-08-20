@@ -9,7 +9,14 @@ export function ProjektDetailInhalt({ projekt }: { projekt: Projekt }) {
       <Seitentitel titel="Projekte" zurueckHref="/projekte" zurueckLabel="Projekte" />
 
       <div className="relative h-[220px] w-full overflow-hidden rounded-lg sm:h-[320px] lg:h-[450px]">
-        <PlatzhalterBild alt="" radius="card" className="absolute inset-0 h-full w-full" />
+        <PlatzhalterBild
+          alt=""
+          radius="card"
+          src={projekt.bildSrc}
+          sizes="100vw"
+          priority
+          className="absolute inset-0 h-full w-full"
+        />
         {/* Einziger im Auftrag ausdruecklich erlaubter Verlauf (Lesbarkeit ueber dem Bild). */}
         <div
           aria-hidden="true"
