@@ -144,4 +144,5 @@ kein weiterer manueller Eingriff nötig.
 - [ ] E-Mail-Vorlagen ("Confirm signup", "Reset Password") auf `/auth/confirm` umgestellt —
       ohne diesen Schritt bleibt die E-Mail-Bestätigung defekt, siehe Abschnitt 5 oben
 - [ ] Transparente Kugelgrafik (`public/sphere.webp`) aus Adobe XD exportiert, siehe Abschnitt 6
-- [ ] Lizenzfreie Bilder für `public/mock/` besorgt und Quellen dokumentiert, siehe Abschnitt 7
+- [x] Lizenzfreie Bilder für `public/mock/` besorgt und Quellen dokumentiert, siehe Abschnitt 7
+      und `docs/bildquellen.md`

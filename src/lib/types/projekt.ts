@@ -13,4 +13,5 @@ export interface Projekt {
   titel: string;
   auftragsbeschreibung: string;
   teilaufgaben: Teilaufgabe[];
+  bildSrc?: string;
 }

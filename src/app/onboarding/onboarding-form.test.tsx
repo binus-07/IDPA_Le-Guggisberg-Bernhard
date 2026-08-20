@@ -43,7 +43,7 @@ describe("OnboardingForm", () => {
     vi.mocked(onboarding).mockResolvedValue({ error: "Speichern hat nicht geklappt." });
     render(<OnboardingForm />);
 
-    // Kompletter Unternehmen-Ablauf (kuerzerer der beiden Zweige: 6 statt 7 Schritte) bis zum
+    // Kompletter Unternehmen-Ablauf (kuerzerer der beiden Zweige: 4 statt 6 Schritte) bis zum
     // Schritt, der die Server Action ausloest.
     fireEvent.click(screen.getByRole("button", { name: /^business Unternehmen/ }));
     fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
@@ -57,12 +57,6 @@ describe("OnboardingForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
     fireEvent.click(screen.getByRole("button", { name: /1–10 Mitarbeitende/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
-
-    fireEvent.click(screen.getByRole("button", { name: /Fotografie/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
-
-    fireEvent.click(screen.getByRole("button", { name: /^Sofort/ }));
     fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
     // Die Fehlermeldung ist im Markup ein normales div ohne role="alert" -- kein

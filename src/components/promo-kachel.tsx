@@ -9,6 +9,7 @@ interface PromoKachelProps {
   ctaHref: string;
   ctaLabel: string;
   bildAlt: string;
+  bildSrc?: string;
   spiegel?: boolean;
 }
 
@@ -19,6 +20,7 @@ export function PromoKachel({
   ctaHref,
   ctaLabel,
   bildAlt,
+  bildSrc,
 }: PromoKachelProps) {
   return (
     <div className="card-hover flex flex-col overflow-hidden rounded-xl border border-border bg-card">
@@ -26,6 +28,8 @@ export function PromoKachel({
         <PlatzhalterBild
           alt={bildAlt}
           radius="card"
+          src={bildSrc}
+          sizes="(min-width: 768px) 50vw, 100vw"
           className="absolute inset-0 h-full w-full"
         />
       </div>
