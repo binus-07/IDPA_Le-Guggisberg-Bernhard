@@ -1,6 +1,5 @@
 // TODO Phase C: durch Supabase-Abfrage ersetzen
 import type { Kategorie } from "@/lib/types/kategorie";
-
 const KATEGORIEN: Kategorie[] = [
   { id: "videografie", name: "Videografie" },
   { id: "webprogrammierung", name: "Webprogrammierung" },

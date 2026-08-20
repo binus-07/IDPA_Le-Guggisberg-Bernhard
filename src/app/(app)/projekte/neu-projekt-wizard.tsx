@@ -5,12 +5,30 @@ import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { getFreelancers } from "@/lib/mock/freelancer";
 import Link from "next/link";
 import { erstelleProjekt } from "./actions";
+import {
+  FragebogenTyp,
+  FragebogenAData,
+  FragebogenBData,
+  StepFragebogenTyp,
+  StepFragebogenA,
+  StepFragebogenB,
+  synthesizeBeschreibung,
+} from "./fragebogen";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 type Modus = "selbst" | "beratung";
 
-type WizardStep = "name" | "modus" | "kontext" | "empfehlung" | "leistungen" | "budget" | "zeitrahmen" | "matching";
+type WizardStep =
+  | "name"
+  | "modus"
+  | "fragebogen-typ"
+  | "fragebogen"
+  | "empfehlung"
+  | "leistungen"
+  | "budget"
+  | "zeitrahmen"
+  | "matching";
 
 type WizardData = {
   name: string;
@@ -19,6 +37,9 @@ type WizardData = {
   leistungen: string[];
   budget: string | null;
   zeitrahmen: string | null;
+  fragebogenTyp: FragebogenTyp | null;
+  fragebogenA: FragebogenAData | null;
+  fragebogenB: FragebogenBData | null;
 };
 
 const defaultData: WizardData = {
@@ -28,11 +49,14 @@ const defaultData: WizardData = {
   leistungen: [],
   budget: null,
   zeitrahmen: null,
+  fragebogenTyp: null,
+  fragebogenA: null,
+  fragebogenB: null,
 };
 
 // Visual step number + total for indicator, depends on path
 function visualStep(step: WizardStep, modus: Modus | null): { current: number; total: number } {
-  const withBeratung: WizardStep[] = ["name", "modus", "kontext", "empfehlung", "budget", "zeitrahmen"];
+  const withBeratung: WizardStep[] = ["name", "modus", "fragebogen-typ", "empfehlung", "budget", "zeitrahmen"];
   const ohnBeratung: WizardStep[] = ["name", "modus", "leistungen", "budget", "zeitrahmen"];
   const sequence = modus === "beratung" ? withBeratung : ohnBeratung;
   const idx = sequence.indexOf(step);
@@ -42,7 +66,7 @@ function visualStep(step: WizardStep, modus: Modus | null): { current: number; t
 // ─── Shared atoms ──────────────────────────────────────────────────────────────
 
 function StepIndicator({ step, modus }: { step: WizardStep; modus: Modus | null }) {
-  if (step === "matching" || step === "empfehlung") return null;
+  if (step === "matching" || step === "empfehlung" || step === "fragebogen") return null;
   const { current, total } = visualStep(step, modus);
   const pct = Math.round((current / total) * 100);
   return (
@@ -335,14 +359,21 @@ const TIPPS = [
 
 function StepEmpfehlung({
   beschreibung,
+  fragebogenTyp,
+  fragebogenA,
+  fragebogenB,
   onNext,
   onBack,
 }: {
   beschreibung: string;
+  fragebogenTyp: import("./fragebogen").FragebogenTyp | null;
+  fragebogenA: import("./fragebogen").FragebogenAData | null;
+  fragebogenB: import("./fragebogen").FragebogenBData | null;
   onNext: (leistungen: string[]) => void;
   onBack: () => void;
 }) {
   const [loading, setLoading] = useState(true);
+  const [strategie, setStrategie] = useState<string | null>(null);
   const [recommended, setRecommended] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [tipps, setTipps] = useState<{ icon: string; text: string }[]>([]);
@@ -353,10 +384,13 @@ function StepEmpfehlung({
     fetch("/api/ki-analyse", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ beschreibung }),
+      body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
     })
       .then((r) => r.json())
       .then((data) => {
+        if (typeof data.strategie === "string" && data.strategie.trim()) {
+          setStrategie(data.strategie.trim());
+        }
         const valid = (data.leistungen as string[] ?? []).filter((l) =>
           ALLE_LEISTUNGEN_LABELS.includes(l)
         );
@@ -410,9 +444,17 @@ function StepEmpfehlung({
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-4 text-center tracking-wide">
         Unsere Empfehlung
       </h1>
-      <p className="text-[#dfc0b7] text-base mb-10 text-center">
-        Basierend auf deiner Projektbeschreibung empfehlen wir dir folgende Leistungen und Freelancer.
-      </p>
+
+      {strategie ? (
+        <div className="w-full flex gap-3 items-start bg-[#1A1D24] border border-[#D95D39]/30 rounded-xl px-5 py-4 mb-10">
+          <span className="material-symbols-outlined text-[#D95D39] text-xl leading-none mt-0.5 flex-shrink-0">auto_awesome</span>
+          <p className="text-[#e2e2e9] text-sm leading-relaxed">{strategie}</p>
+        </div>
+      ) : (
+        <p className="text-[#dfc0b7] text-base mb-10 text-center">
+          Basierend auf deinen Angaben empfehlen wir dir folgende Leistungen und Freelancer.
+        </p>
+      )}
 
       {/* Empfohlene Leistungen */}
       <div className="w-full mb-8">
@@ -802,13 +844,14 @@ function Wizard({ onClose }: { onClose: () => void }) {
   const merge = (updates: Partial<WizardData>) => setData((d) => ({ ...d, ...updates }));
 
   const afterModus = (modus: Modus): WizardStep =>
-    modus === "beratung" ? "kontext" : "leistungen";
+    modus === "beratung" ? "fragebogen-typ" : "leistungen";
 
   const backFrom = (current: WizardStep): WizardStep => {
     const map: Partial<Record<WizardStep, WizardStep>> = {
       modus: "name",
-      kontext: "modus",
-      empfehlung: "kontext",
+      "fragebogen-typ": "modus",
+      fragebogen: "fragebogen-typ",
+      empfehlung: "fragebogen",
       leistungen: "modus",
       budget: data.modus === "beratung" ? "empfehlung" : "leistungen",
       zeitrahmen: "budget",
@@ -849,17 +892,43 @@ function Wizard({ onClose }: { onClose: () => void }) {
           />
         )}
 
-        {step === "kontext" && (
-          <StepKontext
-            initial={data.beschreibung}
-            onNext={(beschreibung) => { merge({ beschreibung }); setStep("empfehlung"); }}
-            onBack={() => setStep(backFrom("kontext"))}
+        {step === "fragebogen-typ" && (
+          <StepFragebogenTyp
+            onSelect={(fragebogenTyp) => { merge({ fragebogenTyp }); setStep("fragebogen"); }}
+            onBack={() => setStep(backFrom("fragebogen-typ"))}
+          />
+        )}
+
+        {step === "fragebogen" && data.fragebogenTyp === "marke" && (
+          <StepFragebogenA
+            initial={data.fragebogenA ?? {}}
+            onComplete={(fragebogenA) => {
+              const beschreibung = synthesizeBeschreibung("marke", fragebogenA);
+              merge({ fragebogenA, beschreibung });
+              setStep("empfehlung");
+            }}
+            onBack={() => setStep(backFrom("fragebogen"))}
+          />
+        )}
+
+        {step === "fragebogen" && data.fragebogenTyp === "produkt" && (
+          <StepFragebogenB
+            initial={data.fragebogenB ?? {}}
+            onComplete={(fragebogenB) => {
+              const beschreibung = synthesizeBeschreibung("produkt", null, fragebogenB);
+              merge({ fragebogenB, beschreibung });
+              setStep("empfehlung");
+            }}
+            onBack={() => setStep(backFrom("fragebogen"))}
           />
         )}
 
         {step === "empfehlung" && (
           <StepEmpfehlung
             beschreibung={data.beschreibung}
+            fragebogenTyp={data.fragebogenTyp}
+            fragebogenA={data.fragebogenA}
+            fragebogenB={data.fragebogenB}
             onNext={(leistungen) => { merge({ leistungen }); setStep("budget"); }}
             onBack={() => setStep(backFrom("empfehlung"))}
           />
