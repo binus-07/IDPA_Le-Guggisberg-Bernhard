@@ -36,13 +36,34 @@ export async function erstelleProjekt(data: ProjektErstellen) {
   return { success: true };
 }
 
+const LEISTUNG_ZU_BILD: Record<string, string> = {
+  "Videografie":        "/mock/kategorie-videografie.jpg",
+  "Webprogrammierung":  "/mock/kategorie-webprogrammierung.jpg",
+  "Fotografie":         "/mock/kategorie-fotografie.jpg",
+  "Content Creation":   "/mock/kategorie-content-creation.jpg",
+  "Print Grafik":       "/mock/kategorie-print-grafik.jpg",
+  "Web Grafik":         "/mock/kategorie-web-grafik.jpg",
+  "Social Media":       "/mock/kategorie-content-creation.jpg",
+  "SEO / SEA":          "/mock/kategorie-webprogrammierung.jpg",
+  "Branding":           "/mock/kategorie-print-grafik.jpg",
+  "Copywriting":        "/mock/kategorie-content-creation.jpg",
+};
+
+function leistungenZuBild(leistungen: string[]): string | undefined {
+  for (const l of leistungen) {
+    if (LEISTUNG_ZU_BILD[l]) return LEISTUNG_ZU_BILD[l];
+  }
+  return undefined;
+}
+
 function dbRowToProjekt(row: Record<string, unknown>): Projekt {
   const leistungen = (row.leistungen as string[] | null) ?? [];
   return {
     id: row.id as string,
     titel: row.name as string,
     auftragsbeschreibung: (row.beschreibung as string | null) ?? "",
-    teilaufgaben: leistungen.map((l) => ({ titel: l, fortschrittProzent: 0 })),
+    bildSrc: leistungenZuBild(leistungen),
+    teilaufgaben: leistungen.map((l) => ({ titel: l, fortschrittProzent: 0, bildSrc: LEISTUNG_ZU_BILD[l] })),
   };
 }
 

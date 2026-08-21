@@ -989,18 +989,20 @@ export function StepFragebogenTyp({
 }) {
   const [selected, setSelected] = useState<FragebogenTyp | null>(null);
 
-  const opts: { value: FragebogenTyp; icon: string; title: string; desc: string }[] = [
+  const opts: { value: FragebogenTyp; icon: string; title: string; desc: string; image: string }[] = [
     {
       value: "marke",
       icon: "brand_awareness",
       title: "Marke / Brand Marketing",
       desc: "Markenbekanntheit aufbauen, Image stärken, Zielgruppen ansprechen — langfristig und strategisch.",
+      image: "/mock/promo-marke.jpg",
     },
     {
       value: "produkt",
       icon: "shopping_bag",
       title: "Produkt / Dienstleistung",
       desc: "Verkäufe steigern, Leads generieren, Conversions maximieren — konkret und messbar.",
+      image: "/mock/promo-produkt.jpg",
     },
   ];
 
@@ -1015,26 +1017,35 @@ export function StepFragebogenTyp({
           <button
             key={opt.value}
             onClick={() => setSelected(opt.value)}
-            className={`bg-[#1A1D24] border-2 rounded-xl p-8 text-left flex flex-col gap-5 transition-all duration-200 focus:outline-none ${
+            className={`bg-[#1A1D24] border-2 rounded-xl overflow-hidden text-left flex flex-col transition-all duration-200 focus:outline-none ${
               selected === opt.value ? "border-[#D95D39]" : "border-[#2D3139] hover:border-[#D95D39]/50"
             }`}
           >
-            <div
-              className={`w-12 h-12 rounded-full bg-[#0D0F14] border flex items-center justify-center transition-colors ${
-                selected === opt.value ? "border-[#D95D39]" : "border-[#2D3139]"
-              }`}
-            >
-              <span
-                className={`material-symbols-outlined transition-colors ${
-                  selected === opt.value ? "text-[#D95D39]" : "text-[#e2e2e9]"
+            <div className="w-full h-40 overflow-hidden">
+              <img
+                src={opt.image}
+                alt={opt.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div className="p-8 flex flex-col gap-5">
+              <div
+                className={`w-12 h-12 rounded-full bg-[#0D0F14] border flex items-center justify-center transition-colors ${
+                  selected === opt.value ? "border-[#D95D39]" : "border-[#2D3139]"
                 }`}
               >
-                {opt.icon}
-              </span>
-            </div>
-            <div>
-              <h2 className="font-semibold text-[#e2e2e9] text-lg mb-2">{opt.title}</h2>
-              <p className="text-[#dfc0b7] text-sm leading-relaxed">{opt.desc}</p>
+                <span
+                  className={`material-symbols-outlined transition-colors ${
+                    selected === opt.value ? "text-[#D95D39]" : "text-[#e2e2e9]"
+                  }`}
+                >
+                  {opt.icon}
+                </span>
+              </div>
+              <div>
+                <h2 className="font-semibold text-[#e2e2e9] text-lg mb-2">{opt.title}</h2>
+                <p className="text-[#dfc0b7] text-sm leading-relaxed">{opt.desc}</p>
+              </div>
             </div>
           </button>
         ))}
