@@ -49,7 +49,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/freelancer/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const freelancer = getFreelancer(id) ?? await getFreelancerFromDb(id);
+  const freelancer = getFreelancer(id) ?? (await getFreelancerFromDb(id));
   return { title: freelancer ? `${freelancer.name} – Freelancer` : "Freelancer nicht gefunden" };
 }
 
@@ -57,7 +57,7 @@ export default async function FreelancerDetailPage({ params }: PageProps<"/freel
   const { id } = await params;
   await enforceRouteGuard(`/freelancer/${id}`);
 
-  const freelancer = getFreelancer(id) ?? await getFreelancerFromDb(id);
+  const freelancer = getFreelancer(id) ?? (await getFreelancerFromDb(id));
 
   if (!freelancer) {
     notFound();

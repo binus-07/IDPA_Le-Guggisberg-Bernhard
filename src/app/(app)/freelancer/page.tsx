@@ -13,7 +13,9 @@ async function ladeFreelancer(): Promise<Freelancer[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("freelancer")
-    .select("freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung,profile_image_url,rating")
+    .select(
+      "freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung,profile_image_url,rating",
+    )
     .order("nachname", { ascending: true });
 
   return (data ?? []).map((fl) => ({
@@ -47,6 +49,10 @@ export default async function FreelancerUebersichtPage({
   const gefiltert = skill ? alle.filter((f) => f.rolle === skill) : alle;
 
   return (
-    <FreelancerUebersichtInhalt freelancer={gefiltert} rollen={rollen} aktiveRolle={skill ?? null} />
+    <FreelancerUebersichtInhalt
+      freelancer={gefiltert}
+      rollen={rollen}
+      aktiveRolle={skill ?? null}
+    />
   );
 }

@@ -4,15 +4,7 @@ import { Seitentitel } from "@/components/seitentitel";
 import { cn } from "@/lib/utils";
 import type { Freelancer } from "@/lib/types/freelancer";
 
-function FilterPill({
-  href,
-  aktiv,
-  children,
-}: {
-  href: string;
-  aktiv: boolean;
-  children: string;
-}) {
+function FilterPill({ href, aktiv, children }: { href: string; aktiv: boolean; children: string }) {
   return (
     <Link
       href={href}

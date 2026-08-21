@@ -28,14 +28,14 @@ function istAktiv(pathname: string, href: string): boolean {
 const FOKUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm";
 
-export function AppShell({ 
-  rolle, 
-  user, 
-  children 
-}: { 
-  rolle: Rolle | null; 
+export function AppShell({
+  rolle,
+  user,
+  children,
+}: {
+  rolle: Rolle | null;
   user?: User | null;
-  children: ReactNode 
+  children: ReactNode;
 }) {
   const pathname = usePathname();
   const [menuOffen, setMenuOffen] = useState(false);
@@ -145,11 +145,8 @@ export function AppShell({
       </header>
 
       <main className="relative z-[1] flex flex-1 flex-col pt-[80px]">{children}</main>
-      
-      <LogoutDialog 
-        isOpen={logoutDialogOpen} 
-        onClose={() => setLogoutDialogOpen(false)} 
-      />
+
+      <LogoutDialog isOpen={logoutDialogOpen} onClose={() => setLogoutDialogOpen(false)} />
     </div>
   );
 }
