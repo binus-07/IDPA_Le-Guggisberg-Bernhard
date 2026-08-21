@@ -1,44 +1,56 @@
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
+import { Sternebewertung } from "@/components/sternebewertung";
 import type { Freelancer } from "@/lib/types/freelancer";
 
+/** Durchschnitt der "Bisherige Projekte"-Bewertungen, oder null ohne Bewertungsdaten. */
+function durchschnittsbewertung(freelancer: Freelancer): number | null {
+  const projekte = freelancer.bisherigeProjekte;
+  if (!projekte || projekte.length === 0) return null;
+  return projekte.reduce((summe, projekt) => summe + projekt.bewertung, 0) / projekte.length;
+}
+
 /**
- * Screen 2 (Freelancer-Auswahl): grosse Karte mit Portrait, Name/Rolle/Erfahrung nebeneinander
- * und Beschreibungstext darunter (line-clamp-5 -- manche Beschreibungen brechen im Mockup
- * bewusst mitten im Satz ab, siehe src/lib/mock/freelancer.ts). Ganze Karte ist ein Link.
+ * Screen 2 (Freelancer-Auswahl): minimalisierte Karte im Look der Home-Ansicht (siehe
+ * FreelancerKarteKompakt) -- nur Portrait, Name, Rolle, Erfahrung und, falls Bewertungsdaten
+ * vorliegen, die Sterne. Der ausfuehrliche Beschreibungstext bleibt der Detailseite vorbehalten,
+ * die Daten dafuer (freelancer.beschreibung) werden weiterhin geladen, nur hier nicht mehr
+ * angezeigt.
  */
 export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
+  const bewertung = durchschnittsbewertung(freelancer);
+
   return (
     <Link
       href={`/freelancer/${freelancer.id}`}
-      className="flex h-full min-w-0 flex-col gap-6 rounded-lg bg-card p-7 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      className="card-hover flex h-full min-w-0 flex-col items-center gap-4 rounded-xl border border-border bg-card p-6 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
-      <div className="flex items-start gap-4">
-        <div className="relative shrink-0">
-          <PlatzhalterBild
-            alt={`Portrait von ${freelancer.name}`}
-            radius="image"
-            className="size-[120px] sm:size-[150px] lg:size-[182px]"
-          />
-          {freelancer.empfohlen ? (
-            <span className="absolute -top-2 -right-2 flex size-8 items-center justify-center rounded-full bg-background text-foreground">
-              <Star aria-hidden="true" className="size-4" fill="currentColor" />
-              <span className="sr-only"> (empfohlen)</span>
-            </span>
-          ) : null}
-        </div>
-        <div className="flex min-w-0 flex-col gap-1 pt-1">
-          <p className="text-name text-foreground">{freelancer.name}</p>
-          <p className="text-body-lg text-muted-foreground">{freelancer.rolle}</p>
-          {freelancer.seitJahren ? (
-            <p className="text-small text-muted-foreground">seit {freelancer.seitJahren} Jahren</p>
-          ) : null}
-        </div>
+      <div className="relative shrink-0">
+        <PlatzhalterBild
+          alt={`Portrait von ${freelancer.name}`}
+          radius="image"
+          className="size-[120px] sm:size-[150px] lg:size-[182px]"
+        />
+        {freelancer.empfohlen ? (
+          <span className="absolute -top-2 -right-2 flex size-8 items-center justify-center rounded-full bg-background text-foreground">
+            <Star aria-hidden="true" className="size-4" fill="currentColor" />
+            <span className="sr-only"> (empfohlen)</span>
+          </span>
+        ) : null}
       </div>
-      {freelancer.beschreibung ? (
-        <p className="text-body-light line-clamp-5 text-foreground">{freelancer.beschreibung}</p>
-      ) : null}
+      <div className="flex w-full min-w-0 flex-col items-center gap-1">
+        <p className="text-name line-clamp-2 w-full text-foreground break-words">
+          {freelancer.name}
+        </p>
+        <p className="text-body-lg line-clamp-2 w-full text-muted-foreground break-words">
+          {freelancer.rolle}
+        </p>
+        {freelancer.seitJahren ? (
+          <p className="text-small text-muted-foreground">seit {freelancer.seitJahren} Jahren</p>
+        ) : null}
+      </div>
+      {bewertung !== null ? <Sternebewertung wert={bewertung} /> : null}
     </Link>
   );
 }
