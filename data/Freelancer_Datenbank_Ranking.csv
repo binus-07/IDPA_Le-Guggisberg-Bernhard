@@ -1,0 +1,31 @@
+﻿Kategorie;Rang;Freelancer-ID;Nachname, Vorname;Jahre tätig;Ø Bewertung Projekte
+Videograf;1;VID-01;Marti, Elena;12;4.9
+Videograf;2;VID-02;Frei, Noah;8;4.73
+Videograf;3;VID-03;Keller, Sina;5;4.9
+Videograf;4;VID-04;Baumann, David;3;4.6
+Videograf;5;VID-05;Yildiz, Aylin;1;4.5
+Webprogrammierer;1;WEB-01;Egli, Thomas;14;4.9
+Webprogrammierer;2;WEB-02;Nair, Priya;9;4.8
+Webprogrammierer;3;WEB-03;Rossi, Marco;6;4.7
+Webprogrammierer;4;WEB-04;Hunziker, Fabienne;4;4.7
+Webprogrammierer;5;WEB-05;Steiner, Leon;2;4.5
+Fotograf;1;FOTO-01;Meier, Ursula;15;4.9
+Fotograf;2;FOTO-02;Weber, Jonas;10;4.8
+Fotograf;3;FOTO-03;Dubois, Michelle;6;4.77
+Fotograf;4;FOTO-04;Ott, Samuel;3;4.6
+Fotograf;5;FOTO-05;Fischer, Lara;1;4.5
+Content Creator;1;CC-01;Roth, Chantal;11;4.9
+Content Creator;2;CC-02;Bucher, Yannick;7;4.7
+Content Creator;3;CC-03;Brunner, Mia;5;4.6
+Content Creator;4;CC-04;Zbinden, Kevin;3;4.5
+Content Creator;5;CC-05;Wyss, Selina;2;4.5
+Print-Grafiker;1;PRINT-01;Gerber, Heinz;13;4.9
+Print-Grafiker;2;PRINT-02;Kunz, Anna;8;4.8
+Print-Grafiker;3;PRINT-03;Moser, Pascal;6;4.6
+Print-Grafiker;4;PRINT-04;Petrović, Ivana;4;4.7
+Print-Grafiker;5;PRINT-05;Lehmann, Timo;1;4.4
+Web-Grafiker;1;WGRAF-01;Huber, Sandra;12;4.83
+Web-Grafiker;2;WGRAF-02;Vogel, Elias;9;4.73
+Web-Grafiker;3;WGRAF-03;Bianchi, Nadia;5;4.6
+Web-Grafiker;4;WGRAF-04;Graf, Simon;3;4.5
+Web-Grafiker;5;WGRAF-05;Amrein, Zoe;1;4.5

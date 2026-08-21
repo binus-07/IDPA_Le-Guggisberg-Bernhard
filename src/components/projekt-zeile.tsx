@@ -16,6 +16,8 @@ export function ProjektZeile({ projekt }: { projekt: Projekt }) {
       <PlatzhalterBild
         alt=""
         radius="image"
+        src={projekt.bildSrc}
+        sizes="(min-width: 640px) 352px, 280px"
         className="aspect-[352/218] w-full max-w-[280px] shrink-0 sm:max-w-[352px]"
       />
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-3">

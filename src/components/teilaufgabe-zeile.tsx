@@ -14,6 +14,8 @@ export function TeilaufgabeZeile({ teilaufgabe }: { teilaufgabe: Teilaufgabe }) 
       <PlatzhalterBild
         alt=""
         radius="image"
+        src={teilaufgabe.bildSrc}
+        sizes="(min-width: 640px) 352px, 280px"
         className="aspect-[352/218] w-full max-w-[280px] shrink-0 sm:max-w-[352px]"
       />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -28,16 +30,20 @@ export function TeilaufgabeZeile({ teilaufgabe }: { teilaufgabe: Teilaufgabe }) 
             />
           </div>
         </div>
-        <p className="text-body text-foreground">
-          {teilaufgabe.freelancerName} {teilaufgabe.freelancerRolle}
-          <span aria-hidden="true"> • </span>
-          {formatChf(teilaufgabe.betragChf)}
-          <span aria-hidden="true"> • </span>
-          Bis {teilaufgabe.frist}
-        </p>
-        <p className="text-body text-foreground">
-          Letzte Nachricht: &bdquo;{teilaufgabe.letzteNachricht}&ldquo;
-        </p>
+        {(teilaufgabe.freelancerName || teilaufgabe.freelancerRolle || teilaufgabe.betragChf != null || teilaufgabe.frist) ? (
+          <p className="text-body text-foreground">
+            {[teilaufgabe.freelancerName, teilaufgabe.freelancerRolle].filter(Boolean).join(" ")}
+            {teilaufgabe.betragChf != null && <><span aria-hidden="true"> • </span>{formatChf(teilaufgabe.betragChf)}</>}
+            {teilaufgabe.frist && <><span aria-hidden="true"> • </span>Bis {teilaufgabe.frist}</>}
+          </p>
+        ) : (
+          <p className="text-body text-muted-foreground">Noch kein Freelancer zugewiesen</p>
+        )}
+        {teilaufgabe.letzteNachricht && (
+          <p className="text-body text-foreground">
+            Letzte Nachricht: &bdquo;{teilaufgabe.letzteNachricht}&ldquo;
+          </p>
+        )}
       </div>
     </div>
   );

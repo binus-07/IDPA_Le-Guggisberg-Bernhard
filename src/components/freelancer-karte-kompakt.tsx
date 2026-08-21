@@ -12,6 +12,8 @@ export function FreelancerKarteKompakt({ freelancer }: { freelancer: Freelancer 
         <PlatzhalterBild
           alt={`Portrait von ${freelancer.name}`}
           radius="card"
+          src={freelancer.bildSrc}
+          sizes="(min-width: 1280px) 20vw, (min-width: 640px) 33vw, 50vw"
           className="absolute inset-0 h-full w-full"
         />
       </div>

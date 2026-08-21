@@ -1,0 +1,21 @@
+﻿Kategorie;Marketing-Aktivität;Einsatz (Marke/Produkt);Zielgruppe;Beschreibung / Nutzen;Fragebogen
+  Website & Landingpages;;;;;
+;Neue Unternehmenswebsite entwickeln;Marke;Beide;Digitale Heimat der Marke aufbauen;Fragebogen A
+;Produkt-Landingpage (Conversion-optimiert);Produkt / Dienstleistung;Beide;Gezielte Seite um Leads oder Käufe zu erzielen;Fragebogen B
+;Kampagnen-Landingpage (für Ads);Produkt / Dienstleistung;Beide;Zielseite für Google Ads / Meta Ads Kampagnen;Fragebogen B
+;Microsite für Produktlaunch;Produkt;Beide;Eigenständige Mini-Website für Neuprodukt;Fragebogen B
+  E-Commerce;;;;;
+;Online-Shop aufbauen (Shopify / WooCommerce);Produkt;B2C;Direktverkauf über eigene Plattform;Fragebogen B
+;Checkout-Optimierung (CRO);Produkt;B2C;Abbrecherquote im Kaufprozess senken;Fragebogen B
+;Produktkonfigurator / interaktiver Produktfinder;Produkt;Beide;Benutzer zum richtigen Produkt führen;Fragebogen B
+  Marketing-Tools & Integrationen;;;;;
+;Newsletter-Tool einbinden (Mailchimp / Klaviyo);Marke / Produkt;Beide;E-Mail-Marketing-Infrastruktur aufbauen;Fragebogen A & B
+;CRM-Integration (HubSpot / Salesforce);Marke / Produkt;B2B;Leads und Kundendaten strukturiert verwalten;Fragebogen A & B
+;Tracking & Analytics einrichten (GA4 / Meta Pixel / GTM);Marke / Produkt;Beide;Kampagnenerfolg messen und optimieren;Fragebogen A & B
+;Cookie-Banner & DSGVO-Lösung;Marke / Produkt;Beide;Rechtskonforme Datenerhebung sicherstellen;Fragebogen A & B
+;Chatbot / Lead-Formular einbauen;Produkt / Dienstleistung;Beide;Automatische Lead-Generierung rund um die Uhr;Fragebogen B
+;Buchungssystem / Terminkalender integrieren;Dienstleistung;Beide;Online-Terminbuchung für Kunden ermöglichen;Fragebogen B
+  Performance & SEO-Technik;;;;;
+;Technisches SEO (Ladezeit / Core Web Vitals / Sitemap);Marke / Produkt;Beide;Google-Ranking durch technische Qualität verbessern;Fragebogen A & B
+;Strukturierte Daten (Schema Markup);Marke / Produkt;Beide;Rich Snippets und bessere Google-Darstellung;Fragebogen A & B
+;A/B-Testing-Setup;Produkt / Dienstleistung;Beide;Datenbasierte Optimierung von Seiten und Kampagnen;Fragebogen B
