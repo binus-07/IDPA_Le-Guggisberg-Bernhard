@@ -989,7 +989,7 @@ export function StepFragebogenTyp({
 }) {
   const [selected, setSelected] = useState<FragebogenTyp | null>(null);
 
-  const opts: { value: FragebogenTyp; icon: string; title: string; desc: string }[] = [
+  const opts: { value: FragebogenTyp; icon: string; title: string; desc: string; image: string }[] = [
     {
       value: "marke",
       icon: "brand_awareness",
