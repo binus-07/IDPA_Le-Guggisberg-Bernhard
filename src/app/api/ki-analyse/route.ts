@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 25;
+
 // ─── Allowed service categories ───────────────────────────────────────────────
 
 const LEISTUNGEN = [
