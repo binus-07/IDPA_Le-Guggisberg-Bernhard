@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Menu, UserIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth/actions";
 import type { Rolle } from "@/lib/auth/route-guard";
 import { Kugel } from "@/components/kugel";
 import { LogoutDialog } from "@/components/logout-dialog";
@@ -17,7 +16,7 @@ function navItems(rolle: Rolle | null): { href: string; label: string }[] {
   const homeHref = rolle === "freelancer" ? "/dashboard/freelancer" : "/dashboard/unternehmen";
   return [
     { href: homeHref, label: "Home" },
-    { href: "/marketing-planung", label: "Marketing Planung" },
+    { href: "/freelancer", label: "Freelancer" },
     { href: "/projekte", label: "Projekte" },
   ];
 }

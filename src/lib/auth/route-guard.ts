@@ -11,11 +11,11 @@ const EMAIL_BESTAETIGT_PATH = "/email-bestaetigt";
 const DASHBOARD_PREFIX = "/dashboard/";
 const AUTH_PAGES = ["/anmelden", "/registrieren"];
 
-// Die vier neuen Mockup-Screens (Marketing-Planung, Freelancer-Detail, Projekte-Uebersicht und
-// -Detail) sind Teil der eingeloggten Anwendung und werden deshalb wie /dashboard/* geschuetzt,
-// obwohl sie keine eigenen dashboardRolleFor()-Eintraege brauchen (keine rollenspezifische
-// Zielseite, nur "eingeloggt + Onboarding abgeschlossen" wie /onboarding selbst).
-const APP_EXACT_PATHS = ["/marketing-planung", "/projekte"];
+// Die Mockup-Screens (Freelancer-Uebersicht und -Detail, Projekte-Uebersicht und -Detail) sind
+// Teil der eingeloggten Anwendung und werden deshalb wie /dashboard/* geschuetzt, obwohl sie
+// keine eigenen dashboardRolleFor()-Eintraege brauchen (keine rollenspezifische Zielseite, nur
+// "eingeloggt + Onboarding abgeschlossen" wie /onboarding selbst).
+const APP_EXACT_PATHS = ["/freelancer", "/projekte"];
 const APP_PREFIXES = ["/freelancer/", "/projekte/"];
 
 function isAppPath(pathname: string): boolean {

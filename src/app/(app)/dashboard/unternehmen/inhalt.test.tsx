@@ -26,9 +26,7 @@ describe("UnternehmenDashboardInhalt", () => {
 
     const planErstellenLinks = screen.getAllByRole("link", { name: "Plan erstellen" });
     expect(planErstellenLinks).toHaveLength(2);
-    planErstellenLinks.forEach((link) =>
-      expect(link).toHaveAttribute("href", "/marketing-planung"),
-    );
+    planErstellenLinks.forEach((link) => expect(link).toHaveAttribute("href", "/projekte"));
 
     expect(screen.getByRole("heading", { name: "Freelancer-Kategorien" })).toBeInTheDocument();
     kategorien.forEach((kategorie) => {

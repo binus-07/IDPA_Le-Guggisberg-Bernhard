@@ -18,9 +18,9 @@ describe("AppShell", () => {
     expect(home).toHaveAttribute("href", "/dashboard/unternehmen");
     expect(home).toHaveClass("text-primary");
 
-    expect(screen.getByRole("link", { name: "Marketing Planung" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Freelancer" })).toHaveAttribute(
       "href",
-      "/marketing-planung",
+      "/freelancer",
     );
     expect(screen.getByRole("link", { name: "Projekte" })).toHaveAttribute("href", "/projekte");
 

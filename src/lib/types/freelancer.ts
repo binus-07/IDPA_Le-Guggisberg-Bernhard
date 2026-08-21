@@ -21,4 +21,8 @@ export interface Freelancer {
   /** Steuert das Stern-Abzeichen (Screen 2 Karte 1, alle Top-Freelancer auf Screen 1). */
   empfohlen: boolean;
   bildSrc?: string;
+  /** Vorberechnete Durchschnittsbewertung (0-5) aus der DB-Spalte freelancer.rating. Bei
+   *  Mock-Freelancern ohne diesen Wert wird stattdessen aus bisherigeProjekte berechnet, siehe
+   *  FreelancerKarte. */
+  rating?: number;
 }

@@ -4,8 +4,12 @@ import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { Sternebewertung } from "@/components/sternebewertung";
 import type { Freelancer } from "@/lib/types/freelancer";
 
-/** Durchschnitt der "Bisherige Projekte"-Bewertungen, oder null ohne Bewertungsdaten. */
-function durchschnittsbewertung(freelancer: Freelancer): number | null {
+/**
+ * Bewertung fuer die Sterne-Anzeige: bevorzugt die vorberechnete DB-Spalte freelancer.rating,
+ * sonst Durchschnitt der "Bisherige Projekte"-Bewertungen (Mock-Freelancer), sonst null.
+ */
+function bewertungFuerAnzeige(freelancer: Freelancer): number | null {
+  if (freelancer.rating != null) return freelancer.rating;
   const projekte = freelancer.bisherigeProjekte;
   if (!projekte || projekte.length === 0) return null;
   return projekte.reduce((summe, projekt) => summe + projekt.bewertung, 0) / projekte.length;
@@ -19,7 +23,7 @@ function durchschnittsbewertung(freelancer: Freelancer): number | null {
  * angezeigt.
  */
 export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
-  const bewertung = durchschnittsbewertung(freelancer);
+  const bewertung = bewertungFuerAnzeige(freelancer);
 
   return (
     <Link

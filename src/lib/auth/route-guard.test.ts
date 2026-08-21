@@ -74,7 +74,7 @@ describe("determineRedirect", () => {
   });
 
   it.each([
-    "/marketing-planung",
+    "/freelancer",
     "/freelancer/thomas-wenger",
     "/projekte",
     "/projekte/brack-alltron",
@@ -85,7 +85,7 @@ describe("determineRedirect", () => {
   });
 
   it.each([
-    "/marketing-planung",
+    "/freelancer",
     "/freelancer/thomas-wenger",
     "/projekte",
     "/projekte/brack-alltron",
@@ -94,7 +94,7 @@ describe("determineRedirect", () => {
   });
 
   it.each([
-    "/marketing-planung",
+    "/freelancer",
     "/freelancer/thomas-wenger",
     "/projekte",
     "/projekte/brack-alltron",
