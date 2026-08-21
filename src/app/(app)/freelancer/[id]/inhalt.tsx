@@ -33,6 +33,13 @@ export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer 
                 <p className="text-body-lg text-muted-foreground">{freelancer.rolle}</p>
               )}
             </div>
+            {freelancer.beschreibung ? (
+              <p className="text-body-light text-foreground">{freelancer.beschreibung}</p>
+            ) : (
+              <p className="text-body-light text-muted-foreground">
+                Noch keine Beschreibung hinterlegt.
+              </p>
+            )}
             {freelancer.bio ? (
               <p className="text-body-light text-foreground">{freelancer.bio}</p>
             ) : (
