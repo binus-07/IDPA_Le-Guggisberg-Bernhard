@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      // Seed-Daten (data/Freelancer_Datenbank_Freelancer.csv, Spalte "Profilfoto (URL)")
+      // verweisen auf randomuser.me-Portraits -- bewusste Mock-Zuordnung aus der bestehenden
+      // CSV, kein zufaellig zugewiesenes Bild, siehe scripts/seed-freelancer.ts.
+      {
+        protocol: "https",
+        hostname: "randomuser.me",
+        pathname: "/api/portraits/**",
+      },
     ],
   },
 };

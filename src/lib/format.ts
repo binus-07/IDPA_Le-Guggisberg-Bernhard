@@ -10,3 +10,8 @@ export function formatChf(betrag: number): string {
   const normalisiert = formatiert.replace(/[.,'  ]/g, "’");
   return `CHF ${normalisiert}`;
 }
+
+/** "seit 1 Jahr" (Singular) vs. "seit 2+ Jahren" (Plural) -- kein "seit 1 Jahren". */
+export function formatSeitJahren(jahre: number): string {
+  return `seit ${jahre} ${jahre === 1 ? "Jahr" : "Jahren"}`;
+}

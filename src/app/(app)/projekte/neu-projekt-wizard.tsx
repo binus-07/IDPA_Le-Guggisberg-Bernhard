@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
+import { Sternebewertung } from "@/components/sternebewertung";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { erstelleProjekt } from "./actions";
+import type { Freelancer } from "@/lib/types/freelancer";
 import {
   FragebogenTyp,
   FragebogenAData,
@@ -32,26 +34,33 @@ type WizardStep =
   | "zeitrahmen"
   | "matching";
 
-type FreelancerKarte = {
+type FreelancerKandidat = {
   id: string;
   name: string;
   rolle: string;
   jahre: number | null;
   bezahlung: number | null;
   bewertung: number | null;
+  bildSrc: string | null;
 };
 
 type AktivitaetGruppeData = {
   aktivitaet: string;
   rolle: string | null;
-  freelancer: FreelancerKarte[];
+  freelancer: FreelancerKandidat[];
 };
+
+/** Form der Treffer aus /api/freelancers (siehe getFreelancerFromDb-Aequivalent dort). */
+type FreelancerTreffer = Pick<
+  Freelancer,
+  "id" | "name" | "rolle" | "seitJahren" | "bildSrc" | "rating"
+>;
 
 type KiCache = {
   strategie: string | null;
   leistungen: string[];
   tipps: { icon: string; text: string }[];
-  freelancer: { id: string; name: string; rolle: string }[];
+  freelancer: FreelancerTreffer[];
   flEmpfehlung: string | null;
   aktivitaeten: string[];
 };
@@ -90,8 +99,22 @@ const defaultData: WizardData = {
 
 // Visual step number + total for indicator, depends on path
 function visualStep(step: WizardStep, modus: Modus | null): { current: number; total: number } {
-  const withBeratung: WizardStep[] = ["name", "modus", "fragebogen-typ", "empfehlung", "aktivitaeten", "freelancer-auswahl"];
-  const ohnBeratung: WizardStep[] = ["name", "modus", "leistungen", "budget", "zeitrahmen", "freelancer-auswahl"];
+  const withBeratung: WizardStep[] = [
+    "name",
+    "modus",
+    "fragebogen-typ",
+    "empfehlung",
+    "aktivitaeten",
+    "freelancer-auswahl",
+  ];
+  const ohnBeratung: WizardStep[] = [
+    "name",
+    "modus",
+    "leistungen",
+    "budget",
+    "zeitrahmen",
+    "freelancer-auswahl",
+  ];
   const sequence = modus === "beratung" ? withBeratung : ohnBeratung;
   const idx = sequence.indexOf(step);
   return { current: idx + 1, total: sequence.length };
@@ -100,7 +123,13 @@ function visualStep(step: WizardStep, modus: Modus | null): { current: number; t
 // ─── Shared atoms ──────────────────────────────────────────────────────────────
 
 function StepIndicator({ step, modus }: { step: WizardStep; modus: Modus | null }) {
-  if (step === "matching" || step === "empfehlung" || step === "fragebogen" || step === "freelancer-auswahl") return null;
+  if (
+    step === "matching" ||
+    step === "empfehlung" ||
+    step === "fragebogen" ||
+    step === "freelancer-auswahl"
+  )
+    return null;
   const { current, total } = visualStep(step, modus);
   const pct = Math.round((current / total) * 100);
   return (
@@ -235,13 +264,7 @@ function StepName({
   );
 }
 
-function StepModus({
-  onSelect,
-  onBack,
-}: {
-  onSelect: (modus: Modus) => void;
-  onBack: () => void;
-}) {
+function StepModus({ onSelect, onBack }: { onSelect: (modus: Modus) => void; onBack: () => void }) {
   const [selected, setSelected] = useState<Modus | null>(null);
 
   const options: { value: Modus; icon: string; title: string; desc: string }[] = [
@@ -347,8 +370,8 @@ function StepKontext({
         </span>
         <p className="text-[#e2e2e9] text-sm leading-relaxed">
           <span className="font-semibold">Wichtig:</span> Erkläre deine Bedürfnisse so genau wie
-          möglich — Zielgruppe, Ziel, Branche, bisherige Massnahmen. Je mehr Details, desto
-          präziser die Empfehlung.
+          möglich — Zielgruppe, Ziel, Branche, bisherige Massnahmen. Je mehr Details, desto präziser
+          die Empfehlung.
         </p>
       </div>
 
@@ -373,7 +396,8 @@ function StepKontext({
 function empfohleneleistungen(beschreibung: string): string[] {
   const t = beschreibung.toLowerCase();
   const hits: string[] = [];
-  if (/instagram|tiktok|social|reels|stories/.test(t)) hits.push("Social Media", "Content Creation");
+  if (/instagram|tiktok|social|reels|stories/.test(t))
+    hits.push("Social Media", "Content Creation");
   if (/video|reels|film|youtube/.test(t)) hits.push("Videografie");
   if (/foto|bild|photoshoot/.test(t)) hits.push("Fotografie");
   if (/web|website|landing|shop/.test(t)) hits.push("Webprogrammierung", "Web Grafik");
@@ -386,8 +410,14 @@ function empfohleneleistungen(beschreibung: string): string[] {
 }
 
 const TIPPS = [
-  { icon: "description", text: "Erstelle ein klares Briefing mit Zielen, Zielgruppe und Deadlines." },
-  { icon: "bar_chart", text: "Definiere messbare KPIs vor Projektstart (Reichweite, Conversions, etc.)." },
+  {
+    icon: "description",
+    text: "Erstelle ein klares Briefing mit Zielen, Zielgruppe und Deadlines.",
+  },
+  {
+    icon: "bar_chart",
+    text: "Definiere messbare KPIs vor Projektstart (Reichweite, Conversions, etc.).",
+  },
   { icon: "handshake", text: "Kläre Nutzungsrechte für alle erstellten Inhalte im Voraus." },
 ];
 
@@ -413,7 +443,7 @@ function StepEmpfehlung({
   const [recommended, setRecommended] = useState<string[]>(cache?.leistungen ?? []);
   const [selected, setSelected] = useState<string[]>(cache?.leistungen ?? []);
   const [tipps, setTipps] = useState<{ icon: string; text: string }[]>(cache?.tipps ?? []);
-  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>(cache?.freelancer ?? []);
+  const [freelancer, setFreelancer] = useState<FreelancerTreffer[]>(cache?.freelancer ?? []);
   const [flEmpfehlung, setFlEmpfehlung] = useState<string | null>(cache?.flEmpfehlung ?? null);
   const [aktivitaeten, setAktivitaeten] = useState<string[]>(cache?.aktivitaeten ?? []);
 
@@ -431,13 +461,23 @@ function StepEmpfehlung({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ fragebogenTyp, fragebogenA, fragebogenB, beschreibung }),
           }).then((r) => r.json());
-          if (typeof kiData.strategie === "string" && kiData.strategie.trim()) setStrategie(kiData.strategie.trim());
-          const valid = (kiData.leistungen as string[] ?? []).filter((l) => ALLE_LEISTUNGEN_LABELS.includes(l));
+          if (typeof kiData.strategie === "string" && kiData.strategie.trim())
+            setStrategie(kiData.strategie.trim());
+          const valid = ((kiData.leistungen as string[]) ?? []).filter((l) =>
+            ALLE_LEISTUNGEN_LABELS.includes(l),
+          );
           leistungen = valid.length > 0 ? valid : empfohleneleistungen(beschreibung);
           setRecommended(leistungen);
           setSelected(leistungen);
-          const rawTipps = Array.isArray(kiData.tipps) && kiData.tipps.length > 0 ? kiData.tipps : null;
-          setTipps(rawTipps ? rawTipps.slice(0, 3).map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text })) : TIPPS);
+          const rawTipps =
+            Array.isArray(kiData.tipps) && kiData.tipps.length > 0 ? kiData.tipps : null;
+          setTipps(
+            rawTipps
+              ? rawTipps
+                  .slice(0, 3)
+                  .map((text: string, i: number) => ({ icon: icons[i] ?? "lightbulb", text }))
+              : TIPPS,
+          );
         } catch {
           leistungen = empfohleneleistungen(beschreibung);
           setRecommended(leistungen);
@@ -457,7 +497,8 @@ function StepEmpfehlung({
             const fl = await fetch(`/api/freelancers?ids=${ids.join(",")}`).then((r) => r.json());
             setFreelancer(Array.isArray(fl) ? fl : []);
           }
-          if (typeof flData.empfehlung === "string" && flData.empfehlung.trim()) setFlEmpfehlung(flData.empfehlung.trim());
+          if (typeof flData.empfehlung === "string" && flData.empfehlung.trim())
+            setFlEmpfehlung(flData.empfehlung.trim());
           if (Array.isArray(flData.aktivitaeten)) setAktivitaeten(flData.aktivitaeten);
         } catch {}
       } finally {
@@ -473,8 +514,12 @@ function StepEmpfehlung({
     return (
       <div className="w-full max-w-2xl flex flex-col items-center justify-center py-20">
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-8">
-          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">autorenew</span>
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">KI analysiert...</span>
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">
+            autorenew
+          </span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">
+            KI analysiert...
+          </span>
         </div>
         <h1 className="font-heading text-4xl text-[#e2e2e9] mb-4 text-center tracking-wide">
           Dein Projekt wird analysiert
@@ -490,8 +535,12 @@ function StepEmpfehlung({
     <div className="w-full max-w-2xl flex flex-col items-center">
       {/* KI badge */}
       <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-6">
-        <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">auto_awesome</span>
-        <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">KI-Analyse</span>
+        <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">
+          auto_awesome
+        </span>
+        <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">
+          KI-Analyse
+        </span>
       </div>
 
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-4 text-center tracking-wide">
@@ -500,7 +549,9 @@ function StepEmpfehlung({
 
       {strategie ? (
         <div className="w-full flex gap-3 items-start bg-[#1A1D24] border border-[#D95D39]/30 rounded-xl px-5 py-4 mb-10">
-          <span className="material-symbols-outlined text-[#D95D39] text-xl leading-none mt-0.5 flex-shrink-0">auto_awesome</span>
+          <span className="material-symbols-outlined text-[#D95D39] text-xl leading-none mt-0.5 flex-shrink-0">
+            auto_awesome
+          </span>
           <p className="text-[#e2e2e9] text-sm leading-relaxed">{strategie}</p>
         </div>
       ) : (
@@ -529,7 +580,9 @@ function StepEmpfehlung({
                 }`}
               >
                 {isRecommended && isActive && (
-                  <span className="material-symbols-outlined text-sm leading-none">auto_awesome</span>
+                  <span className="material-symbols-outlined text-sm leading-none">
+                    auto_awesome
+                  </span>
                 )}
                 {label}
               </button>
@@ -564,12 +617,18 @@ function StepEmpfehlung({
                     <PlatzhalterBild
                       alt={`Portrait von ${f.name}`}
                       radius="card"
+                      src={f.bildSrc}
+                      sizes="(min-width: 768px) 33vw, 50vw"
                       className="absolute inset-0 h-full w-full"
                     />
                   </div>
                   <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
                   <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
-                  <div className="flex text-[#D95D39] text-sm" aria-hidden="true">★★★★★</div>
+                  {f.rating != null && (
+                    <div className="text-[#e2e2e9] text-sm" aria-hidden="false">
+                      <Sternebewertung wert={f.rating} />
+                    </div>
+                  )}
                   <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
                     Empfohlen
                   </div>
@@ -588,8 +647,13 @@ function StepEmpfehlung({
           </p>
           <div className="flex flex-col gap-3">
             {aktivitaeten.map((a, i) => (
-              <div key={i} className="flex items-start gap-3 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-4 py-3">
-                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none mt-0.5 flex-shrink-0">campaign</span>
+              <div
+                key={i}
+                className="flex items-start gap-3 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-4 py-3"
+              >
+                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none mt-0.5 flex-shrink-0">
+                  campaign
+                </span>
                 <p className="text-[#dfc0b7] text-sm leading-relaxed">{a}</p>
               </div>
             ))}
@@ -604,8 +668,13 @@ function StepEmpfehlung({
         </p>
         <div className="flex flex-col gap-3">
           {tipps.map((t, i) => (
-            <div key={i} className="flex items-start gap-3 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-4 py-3">
-              <span className="material-symbols-outlined text-[#D95D39] text-base leading-none mt-0.5 flex-shrink-0">{t.icon}</span>
+            <div
+              key={i}
+              className="flex items-start gap-3 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-4 py-3"
+            >
+              <span className="material-symbols-outlined text-[#D95D39] text-base leading-none mt-0.5 flex-shrink-0">
+                {t.icon}
+              </span>
               <p className="text-[#dfc0b7] text-sm leading-relaxed">{t.text}</p>
             </div>
           ))}
@@ -613,7 +682,16 @@ function StepEmpfehlung({
       </div>
 
       <NavButtons
-        onNext={() => onNext(selected, aktivitaeten, { strategie, leistungen: selected, tipps, freelancer, flEmpfehlung, aktivitaeten })}
+        onNext={() =>
+          onNext(selected, aktivitaeten, {
+            strategie,
+            leistungen: selected,
+            tipps,
+            freelancer,
+            flEmpfehlung,
+            aktivitaeten,
+          })
+        }
         onBack={onBack}
         nextDisabled={selected.length === 0}
         nextLabel="Weiter"
@@ -638,8 +716,12 @@ function StepAktivitaeten({
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
       <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-6">
-        <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">auto_awesome</span>
-        <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">KI-Empfehlung</span>
+        <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">
+          auto_awesome
+        </span>
+        <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">
+          KI-Empfehlung
+        </span>
       </div>
       <h1 className="font-heading text-5xl text-[#e2e2e9] mb-4 text-center tracking-wide">
         Empfohlene Aktivitäten
@@ -658,7 +740,9 @@ function StepAktivitaeten({
                 active ? "border-[#D95D39]" : "border-[#2D3139] hover:border-[#D95D39]/50"
               }`}
             >
-              <span className={`material-symbols-outlined text-base leading-none flex-shrink-0 ${active ? "text-[#D95D39]" : "text-[#4A4D55]"}`}>
+              <span
+                className={`material-symbols-outlined text-base leading-none flex-shrink-0 ${active ? "text-[#D95D39]" : "text-[#4A4D55]"}`}
+              >
                 {active ? "check_circle" : "radio_button_unchecked"}
               </span>
               <p className="text-[#e2e2e9] text-sm font-medium">{a}</p>
@@ -708,7 +792,7 @@ function StepFreelancerAuswahl({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleFreelancer = (id: string) =>
-    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   return (
     <div className="w-full max-w-2xl flex flex-col items-center">
@@ -721,16 +805,24 @@ function StepFreelancerAuswahl({
 
       {loading ? (
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-8">
-          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">autorenew</span>
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">Freelancer werden geladen...</span>
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">
+            autorenew
+          </span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">
+            Freelancer werden geladen...
+          </span>
         </div>
       ) : (
         <div className="w-full flex flex-col gap-10 mb-2">
           {gruppen.map((g) => (
             <div key={g.aktivitaet} className="w-full">
               <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">campaign</span>
-                <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7]">{g.aktivitaet}</p>
+                <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">
+                  campaign
+                </span>
+                <p className="text-xs font-semibold tracking-widest uppercase text-[#dfc0b7]">
+                  {g.aktivitaet}
+                </p>
               </div>
               {g.freelancer.length === 0 ? (
                 <p className="text-[#4A4D55] text-sm">Keine Freelancer gefunden.</p>
@@ -744,33 +836,51 @@ function StepFreelancerAuswahl({
                         <button
                           onClick={() => toggleFreelancer(f.id)}
                           className={`w-full flex flex-col items-center bg-[#1A1D24] border-2 rounded-xl p-4 text-center transition-all focus:outline-none ${
-                            isSelected ? "border-[#D95D39]" : "border-[#2D3139] hover:border-[#D95D39]/50"
+                            isSelected
+                              ? "border-[#D95D39]"
+                              : "border-[#2D3139] hover:border-[#D95D39]/50"
                           }`}
                         >
                           <div className="relative mb-3 w-full overflow-hidden rounded-lg aspect-square">
-                            <PlatzhalterBild alt={`Portrait von ${f.name}`} radius="card" className="absolute inset-0 h-full w-full" />
+                            <PlatzhalterBild
+                              alt={`Portrait von ${f.name}`}
+                              radius="card"
+                              src={f.bildSrc ?? undefined}
+                              sizes="(min-width: 640px) 33vw, 50vw"
+                              className="absolute inset-0 h-full w-full"
+                            />
                           </div>
-                          <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
+                          <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">
+                            {f.name}
+                          </p>
                           <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
                           <div className="flex flex-col gap-1 w-full">
                             {f.bewertung !== null && (
                               <div className="flex items-center justify-center gap-1">
-                                <span className="material-symbols-outlined text-[#D95D39] text-xs leading-none">star</span>
-                                <span className="text-[#dfc0b7] text-xs">{f.bewertung.toFixed(1)}</span>
+                                <span className="material-symbols-outlined text-[#D95D39] text-xs leading-none">
+                                  star
+                                </span>
+                                <span className="text-[#dfc0b7] text-xs">
+                                  {f.bewertung.toFixed(1)}
+                                </span>
                               </div>
                             )}
                             {f.jahre !== null && (
                               <p className="text-[#4A4D55] text-xs">{f.jahre} J. Erfahrung</p>
                             )}
                             {f.bezahlung !== null && (
-                              <p className="text-[#4A4D55] text-xs">Ø CHF {f.bezahlung.toLocaleString("de-CH")}</p>
+                              <p className="text-[#4A4D55] text-xs">
+                                Ø CHF {f.bezahlung.toLocaleString("de-CH")}
+                              </p>
                             )}
                           </div>
                         </button>
                         {/* Auswahl-Checkmark */}
                         {isSelected && (
                           <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#D95D39] flex items-center justify-center pointer-events-none">
-                            <span className="material-symbols-outlined text-white text-xs leading-none">check</span>
+                            <span className="material-symbols-outlined text-white text-xs leading-none">
+                              check
+                            </span>
                           </div>
                         )}
                         {/* Profil-Link */}
@@ -782,7 +892,12 @@ function StepFreelancerAuswahl({
                           className="absolute top-2 left-2 w-6 h-6 rounded-full bg-[#0D0F14]/80 border border-[#2D3139] flex items-center justify-center hover:border-[#D95D39] transition-colors"
                           title="Profil ansehen"
                         >
-                          <span className="material-symbols-outlined text-[#e2e2e9] leading-none" style={{ fontSize: "12px" }}>open_in_new</span>
+                          <span
+                            className="material-symbols-outlined text-[#e2e2e9] leading-none"
+                            style={{ fontSize: "12px" }}
+                          >
+                            open_in_new
+                          </span>
                         </Link>
                       </div>
                     );
@@ -796,8 +911,12 @@ function StepFreelancerAuswahl({
 
       {selected.length > 0 && (
         <div className="w-full mt-4 mb-2 flex items-center gap-2 bg-[#D95D39]/10 border border-[#D95D39]/30 rounded-xl px-4 py-3">
-          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">group</span>
-          <p className="text-[#e2e2e9] text-sm font-semibold">{selected.length} Freelancer ausgewählt</p>
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none">
+            group
+          </span>
+          <p className="text-[#e2e2e9] text-sm font-semibold">
+            {selected.length} Freelancer ausgewählt
+          </p>
         </div>
       )}
 
@@ -812,8 +931,16 @@ function StepFreelancerAuswahl({
 }
 
 const ALLE_LEISTUNGEN_LABELS = [
-  "Videografie", "Webprogrammierung", "Fotografie", "Content Creation",
-  "Print Grafik", "Web Grafik", "Social Media", "SEO / SEA", "Branding", "Copywriting",
+  "Videografie",
+  "Webprogrammierung",
+  "Fotografie",
+  "Content Creation",
+  "Print Grafik",
+  "Web Grafik",
+  "Social Media",
+  "SEO / SEA",
+  "Branding",
+  "Copywriting",
 ];
 
 const LEISTUNGEN = [
@@ -969,13 +1096,14 @@ function StepZeitrahmen({
 }
 
 function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void }) {
-  const [freelancer, setFreelancer] = useState<{ id: string; name: string; rolle: string }[]>([]);
+  const [freelancer, setFreelancer] = useState<FreelancerTreffer[]>([]);
   const [loadingMatch, setLoadingMatch] = useState(true);
 
   useEffect(() => {
-    const frage = data.leistungen.length > 0
-      ? `Ich suche Freelancer für: ${data.leistungen.join(", ")}.`
-      : "Ich suche passende Marketing-Freelancer.";
+    const frage =
+      data.leistungen.length > 0
+        ? `Ich suche Freelancer für: ${data.leistungen.join(", ")}.`
+        : "Ich suche passende Marketing-Freelancer.";
     fetch("/api/freelancer-analyse", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1003,8 +1131,10 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
       </h1>
       <p className="text-[#dfc0b7] text-base mb-3 text-center">
         Basierend auf deinen Angaben haben wir{" "}
-        <span className="text-[#D95D39] font-semibold">{loadingMatch ? "..." : freelancer.length} Freelancer</span> für{" "}
-        <span className="text-[#e2e2e9] font-semibold">«{data.name}»</span> gefunden.
+        <span className="text-[#D95D39] font-semibold">
+          {loadingMatch ? "..." : freelancer.length} Freelancer
+        </span>{" "}
+        für <span className="text-[#e2e2e9] font-semibold">«{data.name}»</span> gefunden.
       </p>
       {data.leistungen.length > 0 && (
         <div className="flex flex-wrap gap-2 justify-center mb-10">
@@ -1020,8 +1150,12 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
       )}
       {loadingMatch ? (
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D95D39]/10 border border-[#D95D39]/30 mb-8">
-          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">autorenew</span>
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">Freelancer werden gesucht...</span>
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none animate-spin">
+            autorenew
+          </span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#D95D39]">
+            Freelancer werden gesucht...
+          </span>
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-4 w-full mb-8">
@@ -1035,14 +1169,18 @@ function StepMatching({ data, onClose }: { data: WizardData; onClose: () => void
                 <PlatzhalterBild
                   alt={`Portrait von ${f.name}`}
                   radius="card"
+                  src={f.bildSrc}
+                  sizes="33vw"
                   className="absolute inset-0 h-full w-full"
                 />
               </div>
               <p className="font-bold text-[#e2e2e9] text-sm mb-0.5 leading-tight">{f.name}</p>
               <p className="text-[#dfc0b7] text-xs mb-2 leading-tight">{f.rolle}</p>
-              <div className="flex text-[#D95D39] text-sm" aria-hidden="true">
-                ★★★★★
-              </div>
+              {f.rating != null && (
+                <div className="text-[#e2e2e9] text-sm">
+                  <Sternebewertung wert={f.rating} />
+                </div>
+              )}
               <div className="mt-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#D95D39]/10 text-[#D95D39] border border-[#D95D39]/30">
                 Match
               </div>
@@ -1088,31 +1226,42 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
       {/* Summary */}
       <div className="w-full flex flex-col gap-3 mb-8">
         <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">folder</span>
+          <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">
+            folder
+          </span>
           <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Projekt</span>
           <span className="text-[#e2e2e9] text-sm font-semibold">{data.name}</span>
         </div>
         {data.budget && (
           <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">payments</span>
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">
+              payments
+            </span>
             <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Budget</span>
             <span className="text-[#e2e2e9] text-sm font-semibold">{data.budget}</span>
           </div>
         )}
         {data.zeitrahmen && (
           <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">schedule</span>
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">
+              schedule
+            </span>
             <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Zeitrahmen</span>
             <span className="text-[#e2e2e9] text-sm font-semibold">{data.zeitrahmen}</span>
           </div>
         )}
         {data.leistungen.length > 0 && (
           <div className="flex items-start gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0 mt-0.5">auto_awesome</span>
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0 mt-0.5">
+              auto_awesome
+            </span>
             <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Leistungen</span>
             <div className="flex flex-wrap gap-2">
               {data.leistungen.map((l) => (
-                <span key={l} className="px-2 py-0.5 rounded-full text-xs font-semibold border border-[#D95D39]/40 text-[#D95D39] bg-[#D95D39]/10">
+                <span
+                  key={l}
+                  className="px-2 py-0.5 rounded-full text-xs font-semibold border border-[#D95D39]/40 text-[#D95D39] bg-[#D95D39]/10"
+                >
                   {l}
                 </span>
               ))}
@@ -1121,9 +1270,13 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
         )}
         {data.selectedFreelancerIds.length > 0 && (
           <div className="flex items-center gap-4 bg-[#1A1D24] border border-[#2D3139] rounded-xl px-5 py-3">
-            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">group</span>
+            <span className="material-symbols-outlined text-[#D95D39] text-base leading-none flex-shrink-0">
+              group
+            </span>
             <span className="text-[#dfc0b7] text-sm w-24 flex-shrink-0">Freelancer</span>
-            <span className="text-[#e2e2e9] text-sm font-semibold">{data.selectedFreelancerIds.length} ausgewählt</span>
+            <span className="text-[#e2e2e9] text-sm font-semibold">
+              {data.selectedFreelancerIds.length} ausgewählt
+            </span>
           </div>
         )}
       </div>
@@ -1135,7 +1288,9 @@ function StepAbschluss({ data, onClose }: { data: WizardData; onClose: () => voi
           onClick={onClose}
         >
           Zu meinen Projekten
-          <span className="material-symbols-outlined text-base leading-none ml-2 align-middle">arrow_forward</span>
+          <span className="material-symbols-outlined text-base leading-none ml-2 align-middle">
+            arrow_forward
+          </span>
         </Link>
         <button
           onClick={onClose}
@@ -1196,21 +1351,30 @@ function Wizard({ onClose }: { onClose: () => void }) {
         {step === "name" && (
           <StepName
             initial={data.name}
-            onNext={(name) => { merge({ name }); setStep("modus"); }}
+            onNext={(name) => {
+              merge({ name });
+              setStep("modus");
+            }}
             onClose={onClose}
           />
         )}
 
         {step === "modus" && (
           <StepModus
-            onSelect={(modus) => { merge({ modus }); setStep(afterModus(modus)); }}
+            onSelect={(modus) => {
+              merge({ modus });
+              setStep(afterModus(modus));
+            }}
             onBack={() => setStep(backFrom("modus"))}
           />
         )}
 
         {step === "fragebogen-typ" && (
           <StepFragebogenTyp
-            onSelect={(fragebogenTyp) => { merge({ fragebogenTyp }); setStep("fragebogen"); }}
+            onSelect={(fragebogenTyp) => {
+              merge({ fragebogenTyp });
+              setStep("fragebogen");
+            }}
             onBack={() => setStep(backFrom("fragebogen-typ"))}
           />
         )}
@@ -1246,7 +1410,10 @@ function Wizard({ onClose }: { onClose: () => void }) {
             fragebogenA={data.fragebogenA}
             fragebogenB={data.fragebogenB}
             cache={data.kiCache}
-            onNext={(leistungen, aktivitaeten, kiCache) => { merge({ leistungen, aktivitaeten, kiCache }); setStep("aktivitaeten"); }}
+            onNext={(leistungen, aktivitaeten, kiCache) => {
+              merge({ leistungen, aktivitaeten, kiCache });
+              setStep("aktivitaeten");
+            }}
             onBack={() => setStep(backFrom("empfehlung"))}
           />
         )}
@@ -1254,7 +1421,10 @@ function Wizard({ onClose }: { onClose: () => void }) {
         {step === "aktivitaeten" && (
           <StepAktivitaeten
             initial={data.aktivitaeten}
-            onNext={(aktivitaeten) => { merge({ aktivitaeten }); setStep("freelancer-auswahl"); }}
+            onNext={(aktivitaeten) => {
+              merge({ aktivitaeten });
+              setStep("freelancer-auswahl");
+            }}
             onBack={() => setStep(backFrom("aktivitaeten"))}
           />
         )}
@@ -1267,9 +1437,10 @@ function Wizard({ onClose }: { onClose: () => void }) {
             initialSelected={data.selectedFreelancerIds}
             onDone={(gruppen, selectedFreelancerIds) => {
               merge({ flAuswahlCache: gruppen, selectedFreelancerIds });
-              const beschreibung = data.leistungen.length > 0
-                ? `Gesucht: ${data.leistungen.join(", ")}.${data.budget ? ` Budget: ${data.budget}.` : ""}${data.zeitrahmen ? ` Zeitrahmen: ${data.zeitrahmen}.` : ""}`
-                : "";
+              const beschreibung =
+                data.leistungen.length > 0
+                  ? `Gesucht: ${data.leistungen.join(", ")}.${data.budget ? ` Budget: ${data.budget}.` : ""}${data.zeitrahmen ? ` Zeitrahmen: ${data.zeitrahmen}.` : ""}`
+                  : "";
               erstelleProjekt({
                 name: data.name,
                 beschreibung,
@@ -1316,7 +1487,10 @@ function Wizard({ onClose }: { onClose: () => void }) {
         {step === "leistungen" && (
           <StepLeistungen
             initial={data.leistungen}
-            onNext={(leistungen) => { merge({ leistungen }); setStep("budget"); }}
+            onNext={(leistungen) => {
+              merge({ leistungen });
+              setStep("budget");
+            }}
             onBack={() => setStep(backFrom("leistungen"))}
           />
         )}
@@ -1324,7 +1498,10 @@ function Wizard({ onClose }: { onClose: () => void }) {
         {step === "budget" && (
           <StepBudget
             initial={data.budget}
-            onNext={(budget) => { merge({ budget }); setStep("zeitrahmen"); }}
+            onNext={(budget) => {
+              merge({ budget });
+              setStep("zeitrahmen");
+            }}
             onBack={() => setStep(backFrom("budget"))}
           />
         )}

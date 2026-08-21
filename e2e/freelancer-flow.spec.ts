@@ -21,7 +21,7 @@ test("Dashboard Unternehmen -> Freelancer-Uebersicht -> Freelancer-Detail", asyn
   await page.getByRole("link", { name: "Freelancer" }).click();
 
   await expect(page).toHaveURL("/freelancer");
-  await expect(page.getByRole("heading", { name: "Freelancer" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Unsere Freelancer" })).toBeVisible();
 
   await page.getByRole("link", { name: /Hannes/ }).click();
 
