@@ -19,7 +19,7 @@ export function UnternehmenDashboardStats({
   ).length;
   const ausgegeben = projekte
     .flatMap((p) => p.teilaufgaben)
-    .reduce((summe, t) => summe + t.betragChf, 0);
+    .reduce((summe, t) => summe + (t.betragChf ?? 0), 0);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
