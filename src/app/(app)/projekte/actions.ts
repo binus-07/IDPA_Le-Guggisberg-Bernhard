@@ -36,12 +36,36 @@ export async function erstelleProjekt(data: ProjektErstellen) {
   return { success: true };
 }
 
+const LEISTUNG_ZU_BILD: Record<string, string> = {
+  "Social Media Content":   "/mock/kategorie-content-creation.jpg",
+  "Grafikdesign":           "/mock/kategorie-web-grafik.jpg",
+  "Foto & Video":           "/mock/kategorie-fotografie.jpg",
+  "Copywriting":            "/mock/kategorie-content-creation.jpg",
+  "SEO & Blogartikel":      "/mock/kategorie-content-creation.jpg",
+  "Google Ads":             "/mock/kategorie-content-creation.jpg",
+  "Meta Ads":               "/mock/kategorie-content-creation.jpg",
+  "E-Mail-Kampagne":        "/mock/kategorie-content-creation.jpg",
+  "Landing Page":           "/mock/kategorie-webprogrammierung.jpg",
+  "Print-Design":           "/mock/kategorie-print-grafik.jpg",
+  "Übersetzungen":          "/mock/kategorie-content-creation.jpg",
+  "Strategie & Beratung":   "/mock/kategorie-content-creation.jpg",
+  "Retail Media":           "/mock/kategorie-content-creation.jpg",
+};
+
+function leistungenZuBild(leistungen: string[]): string | undefined {
+  for (const l of leistungen) {
+    if (LEISTUNG_ZU_BILD[l]) return LEISTUNG_ZU_BILD[l];
+  }
+  return undefined;
+}
+
 function dbRowToProjekt(row: Record<string, unknown>): Projekt {
   const leistungen = (row.leistungen as string[] | null) ?? [];
   return {
     id: row.id as string,
     titel: row.name as string,
     auftragsbeschreibung: (row.beschreibung as string | null) ?? "",
+    bildSrc: leistungenZuBild(leistungen),
     teilaufgaben: leistungen.map((l) => ({ titel: l, fortschrittProzent: 0 })),
   };
 }
