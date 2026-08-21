@@ -16,7 +16,9 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-  console.error("Fehler: NEXT_PUBLIC_SUPABASE_URL oder SUPABASE_SERVICE_ROLE_KEY fehlt in .env.local");
+  console.error(
+    "Fehler: NEXT_PUBLIC_SUPABASE_URL oder SUPABASE_SERVICE_ROLE_KEY fehlt in .env.local",
+  );
   process.exit(1);
 }
 
@@ -38,8 +40,10 @@ function parseCSV(filePath: string): Record<string, string>[] {
     for (let i = 0; i < line.length; i++) {
       const ch = line[i];
       if (ch === '"') {
-        if (inQ && line[i + 1] === '"') { field += '"'; i++; }
-        else inQ = !inQ;
+        if (inQ && line[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else inQ = !inQ;
       } else if (ch === ";" && !inQ) {
         cols.push(field);
         field = "";
@@ -58,7 +62,9 @@ function parseCSV(filePath: string): Record<string, string>[] {
     if (!line) continue;
     const vals = parseLine(line);
     const row: Record<string, string> = {};
-    headers.forEach((h, idx) => { row[h] = (vals[idx] ?? "").trim(); });
+    headers.forEach((h, idx) => {
+      row[h] = (vals[idx] ?? "").trim();
+    });
     rows.push(row);
   }
   return rows;
@@ -80,11 +86,11 @@ async function seedFreelancer() {
         ? parseFloat(r["Ø Bezahlung pro Projekt (CHF)"])
         : null,
       kurzbeschreibung: r["Kurzbeschreibung"] || null,
+      bio: r["Ausführliche Beschreibung"] || null,
+      profile_image_url: r["Profilfoto (URL)"] || null,
     }));
 
-  const { error } = await supabase
-    .from("freelancer")
-    .upsert(data, { onConflict: "freelancer_id" });
+  const { error } = await supabase.from("freelancer").upsert(data, { onConflict: "freelancer_id" });
   if (error) throw new Error(`freelancer: ${error.message}`);
   console.log(`  ✓ ${data.length} Freelancer`);
 }
@@ -110,9 +116,7 @@ async function seedProjekte() {
 async function seedMarketing() {
   await supabase.from("marketing_aktivitaeten").delete().neq("id", 0);
 
-  const rows = parseCSV(
-    path.join(DATA_DIR, "Freelancer_Marketing_Aktivitaeten_Übersicht.csv")
-  );
+  const rows = parseCSV(path.join(DATA_DIR, "Freelancer_Marketing_Aktivitaeten_Übersicht.csv"));
   const data = rows
     .filter((r) => r["Freelancer-Rolle"] && r["Marketing-Aktivität"])
     .map((r) => ({
@@ -144,7 +148,7 @@ async function main() {
         "\nTabellen fehlen. Führe zuerst die Migration aus:\n" +
           "→ Supabase Dashboard → SQL Editor\n" +
           "→ Inhalt von: supabase/migrations/20260820130000_freelancer_und_marketing.sql\n" +
-          "→ Dann nochmal: npm run seed"
+          "→ Dann nochmal: npm run seed",
       );
     }
     process.exit(1);

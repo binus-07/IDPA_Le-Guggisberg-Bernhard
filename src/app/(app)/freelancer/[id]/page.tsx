@@ -12,7 +12,7 @@ async function getFreelancerFromDb(id: string): Promise<Freelancer | null> {
   const { data: fl } = await supabase
     .from("freelancer")
     .select(
-      "freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung,profile_image_url,rating",
+      "freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung,bio,profile_image_url,rating",
     )
     .eq("freelancer_id", id)
     .single();
@@ -38,6 +38,7 @@ async function getFreelancerFromDb(id: string): Promise<Freelancer | null> {
     rolle: fl.rolle as string,
     seitJahren: (fl.jahre_taetig as number | null) ?? undefined,
     beschreibung: (fl.kurzbeschreibung as string | null) ?? undefined,
+    bio: (fl.bio as string | null) ?? undefined,
     bildSrc: (fl.profile_image_url as string | null) ?? undefined,
     rating: (fl.rating as number | null) ?? undefined,
     bisherigeProjekte,

@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("freelancer")
-    .select("freelancer_id,vorname,nachname,rolle")
+    .select("freelancer_id,vorname,nachname,rolle,jahre_taetig,profile_image_url,rating")
     .in("freelancer_id", ids);
   if (error) return NextResponse.json([], { status: 502 });
   return NextResponse.json(
@@ -15,6 +15,9 @@ export async function GET(req: NextRequest) {
       id: String(r.freelancer_id),
       name: `${r.vorname} ${r.nachname}`,
       rolle: r.rolle as string,
-    }))
+      seitJahren: (r.jahre_taetig as number | null) ?? undefined,
+      bildSrc: (r.profile_image_url as string | null) ?? undefined,
+      rating: (r.rating as number | null) ?? undefined,
+    })),
   );
 }

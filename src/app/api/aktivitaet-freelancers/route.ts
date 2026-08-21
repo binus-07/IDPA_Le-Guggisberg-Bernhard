@@ -23,55 +23,44 @@ export async function POST(req: NextRequest) {
 
   const rollen = [...new Set(aktivitaetRolle.values())];
   if (rollen.length === 0) {
-    return NextResponse.json(aktivitaeten.map((a) => ({ aktivitaet: a, rolle: null, freelancer: [] })));
+    return NextResponse.json(
+      aktivitaeten.map((a) => ({ aktivitaet: a, rolle: null, freelancer: [] })),
+    );
   }
 
   const { data: flRows, error: flError } = await supabase
     .from("freelancer")
-    .select("freelancer_id,vorname,nachname,rolle,jahre_taetig,bezahlung_chf")
+    .select(
+      "freelancer_id,vorname,nachname,rolle,jahre_taetig,bezahlung_chf,profile_image_url,rating",
+    )
     .in("rolle", rollen);
 
   if (flError) return NextResponse.json([], { status: 502 });
 
-  // Fetch average ratings
-  const allIds = (flRows ?? []).map((f) => f.freelancer_id as string);
-  const bewertungMap = new Map<string, number>();
-  if (allIds.length > 0) {
-    const { data: projRows } = await supabase
-      .from("freelancer_projekte")
-      .select("freelancer_id,bewertung")
-      .in("freelancer_id", allIds);
-    const sumMap = new Map<string, { sum: number; count: number }>();
-    for (const p of projRows ?? []) {
-      const id = p.freelancer_id as string;
-      const bew = p.bewertung as number | null;
-      if (bew == null) continue;
-      if (!sumMap.has(id)) sumMap.set(id, { sum: 0, count: 0 });
-      const e = sumMap.get(id)!;
-      e.sum += bew;
-      e.count += 1;
-    }
-    for (const [id, { sum, count }] of sumMap) {
-      bewertungMap.set(id, Math.round((sum / count) * 10) / 10);
-    }
-  }
-
-  const freelancerByRolle = new Map<string, {
-    id: string; name: string; rolle: string;
-    jahre: number | null; bezahlung: number | null; bewertung: number | null;
-  }[]>();
+  const freelancerByRolle = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      rolle: string;
+      jahre: number | null;
+      bezahlung: number | null;
+      bewertung: number | null;
+      bildSrc: string | null;
+    }[]
+  >();
 
   for (const f of flRows ?? []) {
     const rolle = f.rolle as string;
     if (!freelancerByRolle.has(rolle)) freelancerByRolle.set(rolle, []);
-    const id = String(f.freelancer_id);
     freelancerByRolle.get(rolle)!.push({
-      id,
+      id: String(f.freelancer_id),
       name: `${f.vorname} ${f.nachname}`,
       rolle,
       jahre: (f.jahre_taetig as number | null) ?? null,
       bezahlung: (f.bezahlung_chf as number | null) ?? null,
-      bewertung: bewertungMap.get(id) ?? null,
+      bewertung: (f.rating as number | null) ?? null,
+      bildSrc: (f.profile_image_url as string | null) ?? null,
     });
   }
 

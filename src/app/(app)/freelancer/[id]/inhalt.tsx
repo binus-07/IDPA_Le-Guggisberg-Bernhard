@@ -2,6 +2,7 @@ import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { Sternebewertung } from "@/components/sternebewertung";
 import { FreelancerSkills } from "@/components/freelancer-skills";
 import { ZurueckPfeil } from "@/components/zurueck-pfeil";
+import { formatSeitJahren } from "@/lib/format";
 import type { Freelancer } from "@/lib/types/freelancer";
 
 export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer }) {
@@ -27,7 +28,7 @@ export function FreelancerDetailInhalt({ freelancer }: { freelancer: Freelancer 
               <p className="text-name-lg text-foreground">{freelancer.name}</p>
               {freelancer.seitJahren ? (
                 <p className="text-body-lg text-muted-foreground">
-                  {freelancer.rolle} seit {freelancer.seitJahren} Jahren
+                  {freelancer.rolle} {formatSeitJahren(freelancer.seitJahren)}
                 </p>
               ) : (
                 <p className="text-body-lg text-muted-foreground">{freelancer.rolle}</p>

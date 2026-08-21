@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Star } from "lucide-react";
 import { PlatzhalterBild } from "@/components/platzhalter-bild";
 import { Sternebewertung } from "@/components/sternebewertung";
+import { formatSeitJahren } from "@/lib/format";
 import type { Freelancer } from "@/lib/types/freelancer";
 
 /**
@@ -53,7 +54,9 @@ export function FreelancerKarte({ freelancer }: { freelancer: Freelancer }) {
           {freelancer.rolle}
         </p>
         {freelancer.seitJahren ? (
-          <p className="text-small text-muted-foreground">seit {freelancer.seitJahren} Jahren</p>
+          <p className="text-small text-muted-foreground">
+            {formatSeitJahren(freelancer.seitJahren)}
+          </p>
         ) : null}
       </div>
       {bewertung !== null ? <Sternebewertung wert={bewertung} /> : null}
