@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { onboardingFullSchema } from "@/lib/auth/validation";
 import { createClient } from "@/lib/supabase/server";
@@ -60,16 +59,11 @@ export async function onboarding(submitData: OnboardingSubmitData): Promise<Onbo
       bio: parsed.data.bio ?? null,
       verfuegbarkeit: parsed.data.verfuegbarkeit ?? null,
       verfuegbar_ab: parsed.data.verfuegbar_ab || null,
-    })
-    .eq("id", user.id);
+    });
 
   if (error) {
     return { error: "Speichern hat nicht geklappt. Bitte versuche es erneut." };
   }
-
-  // Ohne das koennte Next's client-seitiger Router-Cache bei einem erneuten Login kurz
-  // danach noch die alte (rollenlose) RSC-Antwort fuer /onboarding ausliefern.
-  revalidatePath("/onboarding");
 
   return {};
 }
