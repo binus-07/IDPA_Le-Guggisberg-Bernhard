@@ -11,7 +11,9 @@ async function getFreelancerFromDb(id: string): Promise<Freelancer | null> {
 
   const { data: fl } = await supabase
     .from("freelancer")
-    .select("freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung")
+    .select(
+      "freelancer_id,vorname,nachname,rolle,jahre_taetig,kurzbeschreibung,profile_image_url,rating",
+    )
     .eq("freelancer_id", id)
     .single();
 
@@ -36,6 +38,8 @@ async function getFreelancerFromDb(id: string): Promise<Freelancer | null> {
     rolle: fl.rolle as string,
     seitJahren: (fl.jahre_taetig as number | null) ?? undefined,
     beschreibung: (fl.kurzbeschreibung as string | null) ?? undefined,
+    bildSrc: (fl.profile_image_url as string | null) ?? undefined,
+    rating: (fl.rating as number | null) ?? undefined,
     bisherigeProjekte,
     empfohlen: false,
   };
@@ -45,7 +49,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/freelancer/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const freelancer = getFreelancer(id) ?? await getFreelancerFromDb(id);
+  const freelancer = getFreelancer(id) ?? (await getFreelancerFromDb(id));
   return { title: freelancer ? `${freelancer.name} – Freelancer` : "Freelancer nicht gefunden" };
 }
 
@@ -53,7 +57,7 @@ export default async function FreelancerDetailPage({ params }: PageProps<"/freel
   const { id } = await params;
   await enforceRouteGuard(`/freelancer/${id}`);
 
-  const freelancer = getFreelancer(id) ?? await getFreelancerFromDb(id);
+  const freelancer = getFreelancer(id) ?? (await getFreelancerFromDb(id));
 
   if (!freelancer) {
     notFound();

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Menu, UserIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth/actions";
 import type { Rolle } from "@/lib/auth/route-guard";
 import { Kugel } from "@/components/kugel";
 import { LogoutDialog } from "@/components/logout-dialog";
@@ -17,7 +16,7 @@ function navItems(rolle: Rolle | null): { href: string; label: string }[] {
   const homeHref = rolle === "freelancer" ? "/dashboard/freelancer" : "/dashboard/unternehmen";
   return [
     { href: homeHref, label: "Home" },
-    { href: "/marketing-planung", label: "Marketing Planung" },
+    { href: "/freelancer", label: "Freelancer" },
     { href: "/projekte", label: "Projekte" },
   ];
 }
@@ -29,14 +28,14 @@ function istAktiv(pathname: string, href: string): boolean {
 const FOKUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm";
 
-export function AppShell({ 
-  rolle, 
-  user, 
-  children 
-}: { 
-  rolle: Rolle | null; 
+export function AppShell({
+  rolle,
+  user,
+  children,
+}: {
+  rolle: Rolle | null;
   user?: User | null;
-  children: ReactNode 
+  children: ReactNode;
 }) {
   const pathname = usePathname();
   const [menuOffen, setMenuOffen] = useState(false);
@@ -146,11 +145,8 @@ export function AppShell({
       </header>
 
       <main className="relative z-[1] flex flex-1 flex-col pt-[80px]">{children}</main>
-      
-      <LogoutDialog 
-        isOpen={logoutDialogOpen} 
-        onClose={() => setLogoutDialogOpen(false)} 
-      />
+
+      <LogoutDialog isOpen={logoutDialogOpen} onClose={() => setLogoutDialogOpen(false)} />
     </div>
   );
 }

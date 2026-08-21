@@ -73,34 +73,28 @@ describe("determineRedirect", () => {
     expect(determineRedirect({ pathname: "/anmelden", hasSession: false, rolle: null })).toBeNull();
   });
 
-  it.each([
-    "/marketing-planung",
-    "/freelancer/thomas-wenger",
-    "/projekte",
-    "/projekte/brack-alltron",
-  ])("leitet %s ohne Session auf /anmelden um", (pathname) => {
-    expect(determineRedirect({ pathname, hasSession: false, rolle: null })).toBe(
-      `/anmelden?redirect=${encodeURIComponent(pathname)}`,
-    );
-  });
+  it.each(["/freelancer", "/freelancer/thomas-wenger", "/projekte", "/projekte/brack-alltron"])(
+    "leitet %s ohne Session auf /anmelden um",
+    (pathname) => {
+      expect(determineRedirect({ pathname, hasSession: false, rolle: null })).toBe(
+        `/anmelden?redirect=${encodeURIComponent(pathname)}`,
+      );
+    },
+  );
 
-  it.each([
-    "/marketing-planung",
-    "/freelancer/thomas-wenger",
-    "/projekte",
-    "/projekte/brack-alltron",
-  ])("leitet %s ins Onboarding um, wenn Session ohne Rolle vorhanden ist", (pathname) => {
-    expect(determineRedirect({ pathname, hasSession: true, rolle: null })).toBe("/onboarding");
-  });
+  it.each(["/freelancer", "/freelancer/thomas-wenger", "/projekte", "/projekte/brack-alltron"])(
+    "leitet %s ins Onboarding um, wenn Session ohne Rolle vorhanden ist",
+    (pathname) => {
+      expect(determineRedirect({ pathname, hasSession: true, rolle: null })).toBe("/onboarding");
+    },
+  );
 
-  it.each([
-    "/marketing-planung",
-    "/freelancer/thomas-wenger",
-    "/projekte",
-    "/projekte/brack-alltron",
-  ])("erlaubt %s mit Session und Rolle", (pathname) => {
-    expect(determineRedirect({ pathname, hasSession: true, rolle: "unternehmen" })).toBeNull();
-  });
+  it.each(["/freelancer", "/freelancer/thomas-wenger", "/projekte", "/projekte/brack-alltron"])(
+    "erlaubt %s mit Session und Rolle",
+    (pathname) => {
+      expect(determineRedirect({ pathname, hasSession: true, rolle: "unternehmen" })).toBeNull();
+    },
+  );
 });
 
 describe("isSafeRedirectTarget", () => {
