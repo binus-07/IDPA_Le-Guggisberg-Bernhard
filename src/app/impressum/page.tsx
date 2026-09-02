@@ -32,9 +32,9 @@ export default function ImpressumPage() {
         <p className="text-foreground/80">
           Lernende bei der Berufsbildung Baden (BBB)
           <br />
-          Mellingerstrasse 207
+          Wiesenstrasse 32
           <br />
-          5405 Baden, Aargau
+          5400 Baden, Aargau
           <br />
           Schweiz
         </p>
@@ -77,9 +77,28 @@ export default function ImpressumPage() {
         <h2 className="text-lg font-bold text-foreground">Datenschutz</h2>
         <p className="text-foreground/80 leading-relaxed">
           Im Rahmen dieser Lernplattform werden E-Mail-Adresse und Profilinformationen
-          gespeichert, die zur Nutzung der Plattform notwendig sind. Die Daten werden nicht an
-          Dritte weitergegeben und ausschliesslich im Rahmen des IDPA-Projekts verwendet. Es
-          gelten die Bestimmungen des Schweizer Datenschutzgesetzes (DSG).
+          gespeichert, die zur Nutzung der Plattform notwendig sind. Diese Daten werden
+          ausschliesslich im Rahmen des IDPA-Projekts verwendet.
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          <strong className="text-foreground">Hinweis zur KI-Analyse:</strong> Eingaben, die
+          über die KI-Analysefunktion der Plattform getätigt werden, werden an ChatGPT,
+          einen Dienst der OpenAI, L.L.C. (3180 18th Street, San Francisco, CA 94110, USA),
+          übermittelt. OpenAI verarbeitet diese Daten auf Servern in den USA. Durch die Nutzung
+          dieser Funktion stimmen Sie der Übertragung Ihrer Eingaben in die USA zu. Es gelten
+          die Datenschutzbestimmungen von OpenAI (
+          <a
+            href="https://openai.com/policies/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground transition-colors"
+          >
+            openai.com/policies/privacy-policy
+          </a>
+          ).
+        </p>
+        <p className="text-foreground/80 leading-relaxed">
+          Im Übrigen gelten die Bestimmungen des Schweizer Datenschutzgesetzes (DSG).
         </p>
       </section>
     </div>
