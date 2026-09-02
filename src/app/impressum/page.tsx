@@ -32,9 +32,9 @@ export default function ImpressumPage() {
         <p className="text-foreground/80">
           Lernende bei der Berufsbildung Baden (BBB)
           <br />
-          Mellingerstrasse 207
+          Wiesenstrasse 32
           <br />
-          5405 Baden, Aargau
+          5400 Baden, Aargau
           <br />
           Schweiz
         </p>
