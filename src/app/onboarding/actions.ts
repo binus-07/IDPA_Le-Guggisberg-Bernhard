@@ -44,8 +44,7 @@ export async function onboarding(submitData: OnboardingSubmitData): Promise<Onbo
 
   const { error } = await supabase
     .from("profiles")
-    .upsert({
-      id: user.id,
+    .update({
       rolle: parsed.data.rolle,
       anzeigename: parsed.data.anzeigename,
       firmenname: parsed.data.firmenname ?? null,
@@ -59,7 +58,8 @@ export async function onboarding(submitData: OnboardingSubmitData): Promise<Onbo
       bio: parsed.data.bio ?? null,
       verfuegbarkeit: parsed.data.verfuegbarkeit ?? null,
       verfuegbar_ab: parsed.data.verfuegbar_ab || null,
-    });
+    })
+    .eq("id", user.id);
 
   if (error) {
     return { error: "Speichern hat nicht geklappt. Bitte versuche es erneut." };
